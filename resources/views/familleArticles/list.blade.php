@@ -6,13 +6,6 @@
 
 
         <div id="page-wrapper">
-            <div class="row">
-                <div class="col-lg-12">
-                    <h1 class="page-header">Tableau</h1>
-                </div>
-                <!-- /.col-lg-12 -->
-            </div>
-            <!-- /.row -->
 
             <!-- /.row -->
             <div class="row">
@@ -32,9 +25,9 @@
                     @endif
 
                 </div>
-                <div class="col-lg-8 col-md-8 col-md-offset-2">
+                <div class="col-lg-10 col-md-10 col-md-offset-1">
                     <div class="panel panel-default">
-                        <div class="col col-lg-offset-9">
+                        <div class="col col-lg-offset-8">
                             <a href="{{route('familleArticle.create')}}" class="btn btn-info fa fa-plus-circle btn-xl">NOUVELLE FAMILLE</a>
                         </div>
                         <div class="panel-heading">
@@ -47,15 +40,19 @@
                                     <thead>
                                     <tr>
                                         <th>CODE</th>
-                                        <th>LIBELLE</th>
-                                        <th width="100">Action</th>
-                                        <th width="100">Action</th>
+                                        <th>SUPER CATEGORE ARTICLE</th>
+                                        <th>TYPE IMPUTATION</th>
+                                        <th>LIBELLE FAMILLE</th>
+                                        <th width="100">MODIFIER</th>
+                                        <th width="100">SUPPRIMER</th>
                                     </tr>
                                     </thead>
                                     <tbody>
                                     @foreach($familles as $famille)
                                         <tr>
                                             <td>{{$famille->codeFamilleArticle}}</td>
+                                            <td>{{$famille->superCategorie}}</td>
+                                            <td>{{$famille->typeImputation}}</td>
                                             <td>{{$famille->libelleFamilleArticle}}</td>
                                             <td class="text-center">
                                                 <a href="{{route('familleArticle.edit',$famille->slug)}}" class="btn btn-info fa fa-pencil-square-o btn-xl"></a>

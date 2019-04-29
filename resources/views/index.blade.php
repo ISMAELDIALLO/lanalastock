@@ -38,25 +38,17 @@
     <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
     <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery.min.js"></script>
+
+    <link href="//fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href='//fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700' rel='stylesheet'>
     <![endif]-->
      <?php
         //dd($demandes);
             $valeur=compteur();
         ?>
-    <style>
-        /*body {*/
-            /*!*background-color: #0d6aad;*!*/
-            /*background-image: url("images/images.jpg");*/
-            /*height: 100px; !* You must set a specified height *!*/
-            /*background-position: center; !* Center the image *!*/
-            /*background-repeat: no-repeat; !* Do not repeat the image *!*/
-            /*background-size: 50%;*/
-            /*!*background-size: cover; !* Resize the background image to cover the entire container *!*!*/
-        /*}*/
-    </style>
 </head>
 
-<body>
+<div>
 <div class="col-lg-12 col-md-12 thumbnail">
     <!--<img src="img/Voting-Recovered.jpg" alt="brttc" style="background-color:inherit">-->
     <div id="wrapper">
@@ -78,7 +70,7 @@
                         <!-- /input-group -->
                     </li>
                     <li>
-                        <a href="{{--route('')--}}"><i class="fa fa-dashboard fa-fw"></i> Tableau de board</a>
+                        <a href="{{route('home')}}"><i class="fa fa-dashboard fa-fw"></i> ACCUEIL</a>
                     </li>
                     @if(auth()->user())
                         @if(auth()->user()->role=="administrateur")
@@ -104,9 +96,18 @@
                                     <a href="{{route('aApprovisionner')}}"><span class="fa fa-plus-circle">A Approvisionner</span></a>
                                 </li>
                                 <li>
-                                <li>
-                                    <a href="{{route('commande.index')}}"><span class="fa fa-plus-circle">Commandes</span></a>
+                                    <a href="{{route('proformat.index')}}"><span class="fa fa-plus-circle">Proformat</span></a>
                                 </li>
+                                <li>
+                                    <a href="{{route('proformat.create')}}"><span class="fa fa-plus-circle">Toutes Les Factures</span></a>
+                                </li>
+                                <li>
+                                    <a href="{{route('traiteFacture.index')}}"><span class="fa fa-plus-circle">Traiter Facture</span></a>
+                                </li>
+                                <li>
+                                    <a href="{{route('detailCotation.create')}}"><span class="fa fa-plus-circle">Cotations</span></a>
+                                </li><li>
+                                    <a href="{{route('commande.index')}}"><span class="fa fa-plus-circle">Commandes</span></a>
                                 </li>
                                 <li>
                                     <a href="{{route('reception.index')}}"><span class="fa fa-plus-circle">Receptions</span></a>
@@ -126,9 +127,6 @@
                                 </li>
                                 <li>
                                     <a href="{{route('inventaire.index')}}"><span class="fa fa-plus-circle">Inventaires</span></a>
-                                </li>
-                                <li>
-                                    <a href="{{route('coutsParService')}}"><span class="fa fa-plus-circle">Couts/service</span></a>
                                 </li>
                             </ul>
                             <!-- /.nav-second-level -->
@@ -159,6 +157,9 @@
                                 </li>
                                 <li>
                                     <a href="{{route('abilitation.index')}}"><span class="fa fa-plus-circle">Habilitation</span></a>
+                                </li>
+                                <li>
+                                    <a href="{{route('superCategorie.index')}}"><span class="fa fa-plus-circle">Super Categorie Article</span></a>
                                 </li>
                                 <li>
                                     <a href="{{route('familleArticle.index')}}"><span class="fa fa-plus-circle">Familles Article</span></a>
@@ -219,7 +220,7 @@
                 <!-- /.dropdown -->
                 <!-- /.dropdown -->
                 @if(auth()->user())
-                @if(auth()->user()->role=="gestionnaire" || auth()->user()->role== "administrateur")
+                @if(auth()->user()->role=="gestionnaire")
                     <li class="dropdown">
                         <a class="dropdown-toggle" data-toggle="dropdown" style="background-color: #ffffff" href="#">
                             @if($valeur > 0)
@@ -271,14 +272,18 @@
                 <!-- /.dropdown -->
             </ul>
             <!-- /.navbar-top-links -->
-
-
             <!-- /.navbar-static-side -->
         </nav>
         <!-- /#page-wrapper -->
-        @yield('content')
         {{--<img src="images/images.jpg" alt="image d'accueil" width="225" height="225">--}}
+        @yield('content')
     </div>
+</div>
+</div>
+<div class="text-center">
+    <?php $date = new DateTime()?>
+    LANALA-ASSURANCES <br>tout droit reservé <?php echo $date->format('Y');?>
+
 </div>
 <!-- /#wrapper -->
 <!-- Bootstrap Core JavaScript -->

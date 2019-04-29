@@ -15,9 +15,11 @@
         <div class="col-md-8">
             <div class="card" style="">
                 <div class="card-header glyphicon-ban-circle" style="text-align: center; ">{{ __('AUTHENTIFICATION') }}</div>
-
-                <div class="card-body" style="" >
+                <div class="card-body" style="">
                     <form method="POST" action="{{ route('login') }}">
+                        <div class="text-center">
+                            <img src="images/lanalaLogo.png">
+                        </div>
                         @csrf
 
                         <div class="form-group row">

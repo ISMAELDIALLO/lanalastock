@@ -40,7 +40,7 @@
                                     </form>
                                     <div class="col-md-8 col-lg-8 col-xs-12">
                                         <div class="panel panel-default">
-                                            <div class="col col-lg-offset-9">
+                                            <div class="col col-lg-offset-8">
                                                 <a href="{{route('temporaireDemande.create')}}" class="btn btn-info fa fa-plus-circle btn-xl">REMPLIR LE PANIER</a>
                                             </div>
                                             <div class="panel-heading">

@@ -6,12 +6,6 @@
 
 
         <div id="page-wrapper">
-            <div class="row">
-                <div class="col-lg-12">
-                    <h1 class="page-header">Tableau</h1>
-                </div>
-                <!-- /.col-lg-12 -->
-            </div>
             <!-- /.row -->
 
             <!-- /.row -->
@@ -34,7 +28,7 @@
                 </div>
                 <div class="col-lg-12">
                     <div class="panel panel-default">
-                        <div class="col col-lg-offset-10">
+                        <div class="col col-lg-offset-9 col-md-offset-9">
                             <a href="{{route('detailReception.create')}}" class="btn btn-info fa fa-plus-circle btn-xl">NOUVELLE RECEPTION</a>
                         </div>
                         <div class="panel-heading">

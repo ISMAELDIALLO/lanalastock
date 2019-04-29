@@ -6,12 +6,6 @@
 
 
         <div id="page-wrapper">
-            <div class="row">
-                <div class="col-lg-12">
-                    <h1 class="page-header">Tableau</h1>
-                </div>
-                <!-- /.col-lg-12 -->
-            </div>
             <!-- /.row -->
 
             <!-- /.row -->
@@ -32,13 +26,10 @@
                     @endif
 
                 </div>
-                    <div class="col-lg-6 col-md-6 col-lg-offset-3 col-md-offset-2">
+                    <div class="col-lg-10 col-md-10 col-lg-offset-1 col-md-offset-1">
                     <div class="panel panel-default">
-                        <div class="col col-lg-offset-9">
-                            <a href="{{route('parametre.create')}}" class="btn btn-info fa fa-plus-circle btn-xl">CREER</a>
-                        </div>
                         <div class="panel-heading">
-                            Le mail du gestionnaire
+                            Le mail du gestionnaire et Auditaire
                         </div>
                         <!-- /.panel-heading -->
                         <div class="panel-body">
@@ -47,13 +38,15 @@
                                     <thead>
                                     <tr>
                                         <th>EMAIL DU GESTIONNAIRE</th>
-                                        <th width="100">Action</th>
+                                        <th>EMAIL DE L'AUDITAIRE</th>
+                                        <th width="100">MODIFIER</th>
                                     </tr>
                                     </thead>
                                     <tbody>
                                     @foreach($parametres as $parametre)
                                         <tr>
                                             <td>{{$parametre->mailGestionnaire}}</td>
+                                            <td>{{$parametre->mailAuditaire}}</td>
                                             <td class="text-center">
                                                 <a href="{{route('parametre.edit',$parametre->id)}}" class="btn btn-info fa fa-pencil-square-o btn-xl"></a>
                                             </td>

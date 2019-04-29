@@ -54,7 +54,7 @@ class CategorieFournisseurController extends Controller
      */
     public function store(categorieFournisseurFormResquest $request)
     {
-        //Avant tout d'abord on verifie si la famille d'article n'existe pas dans la table avant d'inserer
+        //Avant tout d'abord on verifie si la categorie du fournisseur n'existe pas dans la table avant d'inserer
         //Si elle existe on ramene un message d'erreur
         //Dans le cas contraire on passe pour l'insertion
         $categorieFournisseur = CategorieFournisseur::where('libelleCategorieFournisseur',$request->input('categorie'))->first();

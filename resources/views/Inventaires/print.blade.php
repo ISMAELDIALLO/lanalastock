@@ -19,12 +19,13 @@
 </head>
 <body>
 <div class="container">
+    <img src="images/lanalaLogo.png">
     <div class="row">
         <div class="col-md-10 col-md-offset-1">
             <div class="panel panel-default">
                 <div class="panel-body">
                     <div class="row panel-heading col-md-offset-8 jumbotron-fluid text-center" >
-                        BON D'INVENTAIRE LANALA_ASSURANCES
+                        BON D'INVENTAIRE
                     </div>
                     <br>
                     <br>

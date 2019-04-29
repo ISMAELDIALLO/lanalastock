@@ -19,12 +19,13 @@
 </head>
 <body>
 <div class="container">
+    <img src="images/lanalaLogo.png">
     <div class="row">
         <div class="col-md-10 col-md-offset-1">
             <div class="panel panel-default">
                 <div class="panel-body">
                     <div class="row panel-heading col-md-offset-8 jumbotron-fluid text-center" >
-                        BON DE COMMANDE LANALA_ASSURANCES
+                        BON DE COMMANDE
                     </div>
                     <br>
                     <br>
@@ -49,36 +50,57 @@
                         </div>
                     </div>
                     <hr class="h3 panel-heading">
-                    <table class="table table-bordered table-hover text-center">
+                    <table class="table table-bordered table-hover text-center grise">
                         <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>ARTICLE</th>
-                            <th>QUANTITE</th>
-                            <th>PRIX UNITAIRE</th>
-                            <th>MONTANT</th>
+                        <tr class="grise">
+                            <th class="text-center grise">#</th>
+                            <th class="text-center grise">ARTICLE</th>
+                            <th class="text-center grise">QUANTITE</th>
+                            <th class="text-center grise">PRIX UNITAIRE</th>
+                            <th class="text-center grise">MONTANT</th>
                         </tr>
                         </thead>
-                        <tbody class="text-center col-md-offset-1">
+                        <tbody class="text-center col-md-offset-1 col_line">
                         <?php $i=0; ?>
                         @foreach($commandes as $commande)
-                            <tr>
-                                <td><?php $i++; echo $i;?></td>
-                                <td>{{$commande->libelleArticle}}</td>
-                                <td>{{$commande->quantite}}</td>
-                                <td>{{$commande->dernierPrix}}</td>
-                                <td>{{$commande->quantite*$commande->dernierPrix}}</td>
+                            <tr class="col_line">
+                                <td class="col_line"><?php $i++; echo $i;?></td>
+                                <td class="col_line">{{$commande->libelleArticle}}</td>
+                                <td class="col_line">{{$commande->quantite}}</td>
+                                <td class="col_line">{{$commande->dernierPrix}}</td>
+                                <td class="col_line">{{$commande->quantite*$commande->dernierPrix}}</td>
                             </tr>
                         @endforeach
                         </tbody>
                     </table>
-                    <br>
+                        <div class="row">
+                            <div class="col-lg-3 col-md-3 col-md-offset-3">
+                                 <span class="col-md-offset-6">MONTANT TOTAL :    {{$montant}}</span>
+                            </div>
+                        </div>
                     <br>
                     <div class="row col-lg-12 col-md-12 col-md-offset-2">
                         <div class="col-md-offset-1 col-md-3">
-                            <span>MONTANT TOTAL : </span>
-                            <span>{{$montant}}</span>
+                            <span><b>{{$modePayement}}</b></span>
                         </div>
+                    </div>
+                    <div class="row">
+                        <br>
+                        <table class="table table-bordered border-table-hover text-center col_line">
+                            <thead>
+                            <tr class="grise col_line">
+                                <th class="text-center col_line" colspan="2">VISAS:</th>
+                            </tr>
+                            <tr class="col_line">
+                                <th class="text-center col_line">Signature et Cachet</th>
+                                <th class="text-center col_line">Signature et Cachet</th>
+                            </tr>
+                            <tr class="col_line">
+                                <th class="text-center col_line" height="80px"></th>
+                                <th class="text-center col_line" height="80"></th>
+                            </tr>
+                            </thead>
+                        </table>
                     </div>
                 </div>
             </div>

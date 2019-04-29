@@ -6,12 +6,6 @@
 
 
         <div id="page-wrapper">
-            <div class="row">
-                <div class="col-lg-12">
-                    <h1 class="page-header">Tableau</h1>
-                </div>
-                <!-- /.col-lg-12 -->
-            </div>
             <!-- /.row -->
 
             <!-- /.row -->
@@ -34,7 +28,7 @@
                 </div>
                 <div class="col-lg-8 col-md-8 col-md-offset-2">
                     <div class="panel panel-default">
-                        <div class="col col-lg-offset-9">
+                        <div class="col col-lg-offset-8 col-md-offset-8">
                             <a href="{{route('societe.create')}}" class="btn btn-info fa fa-plus-circle btn-xl">NOUVELLE SOCIETE</a>
                         </div>
                         <div class="panel-heading">
@@ -47,7 +41,6 @@
                                     <thead>
                                     <tr>
                                         <th>SOCIETE</th>
-                                        <th>POURCENTAGE</th>
                                         <th width="100">Action</th>
                                         <th width="100">Action</th>
                                     </tr>
@@ -56,7 +49,6 @@
                                     @foreach($societes as $societe)
                                         <tr>
                                             <td>{{$societe->nomSociete}}</td>
-                                            <td>{{$societe->pourcentage}}</td>
                                             <td class="text-center">
                                                 <a href="{{route('societe.edit',$societe->slug)}}" class="btn btn-info fa fa-pencil-square-o btn-xl"></a>
                                             </td>

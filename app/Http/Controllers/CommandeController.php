@@ -8,6 +8,7 @@ use App\Http\Requests\commandeFormResquest;
 use \DateTime;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use MercurySeries\Flashy\Flashy;
 use PDF;
 
 class CommandeController extends Controller
@@ -27,7 +28,9 @@ class CommandeController extends Controller
 
         $commandes=DB::table('fournisseurs')
             ->join('commandes','fournisseurs.id','=','commandes.fournisseurs_id')
-            ->select('fournisseurs.nomSociete','fournisseurs.nomDuContact','fournisseurs.prenomDuContact','fournisseurs.telephoneDuContact','commandes.*')
+            ->join('cotations', 'cotations.id', '=', 'commandes.cotations_id')
+            ->select('fournisseurs.nomSociete','fournisseurs.nomDuContact','fournisseurs.prenomDuContact','fournisseurs.telephoneDuContact',
+                'cotations.codeCotation','commandes.*')
             ->get();
         return view('commandes.liste',compact('commandes', 'demandes'));
     }
@@ -89,11 +92,12 @@ class CommandeController extends Controller
 
         $demandes = nonConsult();
 
-        $details = DB::table('commandes')
+        $details = DB::table('cotations')
+            ->join('commandes', 'cotations.id', '=', 'commandes.cotations_id')
             ->join('line_de_commandes', 'commandes.id', '=', 'line_de_commandes.commandes_id')
             ->join('articles', 'articles.id', '=', 'line_de_commandes.articles_id')
             ->where('line_de_commandes.commandes_id', '=', $id)
-            ->select('articles.libelleArticle', 'commandes.codeCommande', 'line_de_commandes.*')
+            ->select('articles.libelleArticle', 'commandes.codeCommande','cotations.codeCotation', 'line_de_commandes.*')
             ->get();
 
         $codeCommande = "";
@@ -117,22 +121,36 @@ class CommandeController extends Controller
             ->join('commandes','commandes.id','=','line_de_commandes.commandes_id')
             ->join('fournisseurs','fournisseurs.id','=','commandes.fournisseurs_id')
             ->select('line_de_commandes.quantite','line_de_commandes.prixUnitaire','articles.libelleArticle','articles.dernierPrix','fournisseurs.nomSociete','commandes.*')
-            ->where('commandes.slug','=',$slug)
+            ->where('line_de_commandes.commandes_id','=',$slug)
             ->get();
         $codeCommande="";
         $dateCommande="";
         $fournisseur="";
         $montant=0;
+        $modePayement = "";
         foreach ($commandes as $commande){
             $codeCommande=$commande->codeCommande;
             $dateCommande=$commande->dateCommande;
+            $modePayement = $commande->modePayement;
             $fournisseur=$commande->nomSociete;
             $montant+=($commande->quantite*$commande->dernierPrix);
         }
 
-        $pdf = PDF::loadView('commandes.print', compact('commandes','codeCommande','dateCommande','fournisseur','montant'))->setPaper('a4', 'portrait');
+        $pdf = PDF::loadView('commandes.print', compact('commandes','codeCommande','dateCommande','modePayement','fournisseur','montant'))->setPaper('a4', 'portrait');
         $fileName = $codeCommande;
         return $pdf->stream($fileName . '.pdf');
+    }
+
+    public function conditionPayement($id){
+        //nonConsult() est une methode helper qui retourne l'ensemble des comandes non consultees
+        //$demandes est utilisee a la page d'accueil apres l'authentification
+        //donc necessaires pour toutes les fonction qui utilse cette page
+
+        $demandes = nonConsult();
+
+        $commande = Commande::findOrFail($id);
+
+        return view('commandes.conditionPayement', compact('commande', 'demandes'));
     }
 
     public function pdfExport($id){
@@ -166,9 +184,18 @@ class CommandeController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(commandeFormResquest $request, $slug)
+    public function update(Request $request, $slug)
     {
+        if($request->input('conditionPayement')){
+            $commande = Commande::whereSlug($slug)->first();
+            $commande->modePayement = $request->input('conditionPayement');
+            $commande->save();
 
+            return redirect()->route('commande.index');
+        }
+
+        Flashy::error('Le champ condition de payement est requis');
+        return back();
     }
 
     /**

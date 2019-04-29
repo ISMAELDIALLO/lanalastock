@@ -6,12 +6,6 @@
 
 
         <div id="page-wrapper">
-            <div class="row">
-                <div class="col-lg-12">
-                    <h1 class="page-header">Tableau</h1>
-                </div>
-                <!-- /.col-lg-12 -->
-            </div>
             <!-- /.row -->
 
             <!-- /.row -->
@@ -34,7 +28,7 @@
                 </div>
                 <div class="col-lg-12">
                     <div class="panel panel-default">
-                        <div class="col col-lg-offset-10">
+                        <div class="col col-lg-offset-9">
                             <a href="{{route('ligneDeCommande.create')}}" class="btn btn-info fa fa-plus-circle btn-xl">NOUVELLE COMMANDE</a>
                         </div>
                         <div class="panel-heading">
@@ -46,26 +40,32 @@
                                 <table width="100%" class="table table-striped table-bordered table-hover text-center" id="dataTables-example">
                                     <thead>
                                     <tr>
+                                        <th class="text-center">COTATION</th>
                                         <th class="text-center">COMMANDE</th>
                                         <th class="text-center">DATE COMMANDE</th>
                                         <th class="text-center">SOCIETE</th>
                                         <th class="text-center">LE CONTACT</th>
                                         <th class="text-center" width="100">DETAILS</th>
+                                        <th class="text-center">MODE DE PAYEMENT</th>
                                         <th class="text-center" width="100">IMPRIMER</th>
                                     </tr>
                                     </thead>
                                     <tbody>
                                     @foreach($commandes as $commande)
                                         <tr>
+                                            <td>{{$commande->codeCotation}}</td>
                                             <td>{{$commande->codeCommande}}</td>
                                             <td>{{$commande->dateCommande}}</td>
                                             <td>{{$commande->nomSociete}}</td>
-                                            <td>{{$commande->nomDuContact}} {{$commande->prenomDuContact}} {{$commande->telephoneDuContact}}</td>
+                                            <td>{{$commande->nomDuContact}} {{$commande->prenomDuContact}}</td>
                                             <td>
                                                 <a href="{{route('commande.show', $commande->id)}}" class="btn btn-info fa fa-list"></a>
                                             </td>
                                             <td>
-                                                <a href="{{route('commande.edit',$commande->slug)}}" class="btn btn-info fa fa-print btn-xl"></a>
+                                                <a href="{{route('conditionPayement', $commande->id)}}" class="btn btn-info fa fa-credit-card"></a>
+                                            </td>
+                                            <td>
+                                                <a href="{{route('commande.edit',$commande->id)}}" class="btn btn-info fa fa-print btn-xl"></a>
                                             </td>
                                         </tr>
                                     @endforeach

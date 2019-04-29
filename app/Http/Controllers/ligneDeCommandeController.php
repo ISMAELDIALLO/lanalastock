@@ -60,49 +60,111 @@ class ligneDeCommandeController extends Controller
         return view('ligneDeCommandes.create',compact('fournisseurs','lignes', 'demandes'));
     }
 
+    public function createCommande($id){
+        //nonConsult() est une methode helper qui retourne l'ensemble des comandes non consultees
+        //$demandes est utilisee a la page d'accueil apres l'authentification
+        //donc necessaires pour toutes les fonction qui utilse cette page
+
+        $demandes = nonConsult();
+
+        $fournisseurs=Fournisseur::all();
+        /*
+         * Selection des lignes de commande
+         */
+        $lignes=DB::table('articles')
+            ->join('detail_cotations','articles.id','=','detail_cotations.articles_id')
+            ->join('cotations','cotations.id','=','detail_cotations.cotations_id')
+            ->select('articles.libelleArticle','articles.referenceArticle','cotations.codeCotation','detail_cotations.*')
+            ->where('detail_cotations.cotations_id',$id)
+            ->get();
+
+
+        Session::put('idCotation',$id);
+        return view('ligneDeCommandes.create',compact('fournisseurs','lignes', 'demandes'));
+    }
+
     /**
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(commandeFormResquest $request)
+    public function store(Request $request)
     {
-       //dd('hee u es la');
-        $date=new DateTime();
-        //Enregistrement de la commande
-        $coms=Commande::select(DB::raw("CONCAT('CM0', MAX(CAST(RIGHT(codeCommande,LENGTH(codeCommande)-3) AS UNSIGNED))+1) AS code"))
-            ->get();
-        $cm="CM01";
-        foreach ($coms as $com){
-            if ($com->code){
-                $cm=$com->code;
-            }
-        }
-        $commandes=new Commande();
-        $commandes->fournisseurs_id=$request->input('fournisseur');
-        $commandes->codeCommande=$cm;
-        $commandes->dateCommande=$request->input('dateCommande');
-        $commandes->slug=$request->input('dateCommande').$date->format('YmdHis');
-        $commandes->save();
 
-        //Selection de l'identifiant de la commande
-        $idCommande=Commande::max('id');
-        /*Insertion dans ligne de commande, tanque ya d'enregistrement dans la table temporaire on insert dans la table
-         ligne de commande et à chque fois on un nouvel objet et apres insertion on supprime les données dans la table temporaire
-        */
-        $tableTemporaires=tableTemporaire::all();
-        foreach ($tableTemporaires as $tableTemporaire){
-            $ligneCommande=new LineDeCommande();
-            $ligneCommande->commandes_id=$idCommande;
-            $ligneCommande->articles_id=$tableTemporaire->articles;
-            $ligneCommande->quantite=$tableTemporaire->quantite;
-            $ligneCommande->prixUnitaire = Article::findOrFail($tableTemporaire->articles)->dernierPrix;
-            $ligneCommande->slug=$tableTemporaire->articles.$date->format('YmdHis');
-            $ligneCommande->save();
-        }
-        //Vider la table temporaire
-        tableTemporaire::truncate();
+        $date = new DateTime();
+
+        //dd($request->input('article'));
+
+        $lignes=DB::table('articles')
+            ->join('detail_cotations','articles.id','=','detail_cotations.articles_id')
+            ->join('cotations','cotations.id','=','detail_cotations.cotations_id')
+            ->select('articles.libelleArticle','articles.dernierPrix','cotations.codeCotation','detail_cotations.*')
+            ->where('detail_cotations.cotations_id',session('idCotation'))
+            ->get();
+       foreach ($lignes as $ligne){
+           $temp = new tableTemporaire();
+           if ($request->input('prixUnitaire'.$ligne->id)){
+//               $testCommande = Commande::where([
+//                   'cotations_id' => session('idCotation'),
+//                   'fournisseurs_id' => $request->input('fournisseur'.$ligne->id)
+//               ])->get();
+
+               $testCommande = DB::table('commandes')
+                   ->where([
+                       ['cotations_id', session('idCotation')],
+                       ['fournisseurs_id', $request->input('fournisseur'.$ligne->id)]
+                   ])
+                   ->select('commandes.*')->get();
+
+
+               if($testCommande->count() > 0){
+                   //on recupere l'id de la commande pour l'inserer dans la ligne de commande
+                   $idC = 0;
+                   foreach($testCommande as $test){
+                       $idC = $test->id;
+                   }
+                   $ligneCommande = new LineDeCommande();
+                   $ligneCommande->commandes_id = $idC;
+                   $ligneCommande->articles_id = $ligne->articles_id;
+                   $ligneCommande->quantite = $ligne->quantite;
+                   $ligneCommande->prixUnitaire = $request->input('prixUnitaire'.$ligne->id);
+                   $ligneCommande->slug = $ligne->articles_id.$date->format('YmdHis');
+                   $ligneCommande->save();
+
+               }else{
+                   //Enregistrement de la commande
+                   $coms=Commande::select(DB::raw("CONCAT('CM0', MAX(CAST(RIGHT(codeCommande,LENGTH(codeCommande)-3) AS UNSIGNED))+1) AS code"))
+                       ->get();
+                   $cm="CM01";
+                   foreach ($coms as $com){
+                       if ($com->code){
+                           $cm=$com->code;
+                       }
+                   }
+
+                   //dans le cas contraire on cree la commande et la ligne de commande
+                   $commandes=new Commande();
+                   $commandes->fournisseurs_id=$request->input('fournisseur'.$ligne->id);
+                   $commandes->cotations_id = session('idCotation');
+                   $commandes->users_id = auth()->user()->id;
+                   $commandes->codeCommande=$cm;
+                   $commandes->dateCommande=$date->format('Y-m-d');
+                   $commandes->slug=$request->input('dateCommande').$date->format('YmdHis');
+                   $commandes->save();
+
+                   //on insere dans ligne aussi
+
+                   $ligneCommande = new LineDeCommande();
+                   $ligneCommande->commandes_id = Commande::max('id');
+                   $ligneCommande->articles_id = $ligne->articles_id;
+                   $ligneCommande->quantite = $ligne->quantite;
+                   $ligneCommande->prixUnitaire = $request->input('prixUnitaire'.$ligne->id);
+                   $ligneCommande->slug = $ligne->articles_id . $date->format('YmdHis');
+                   $ligneCommande->save();
+               }
+           }
+       }
         return redirect()->route('commande.index');
     }
 

@@ -1,19 +1,9 @@
 @extends('index')
 @section('content')
     <div id="wrapper">
-
         <!-- Navigation -->
-
-
         <div id="page-wrapper">
-            <div class="row">
-                <div class="col-lg-12">
-                    <h1 class="page-header">Tableau</h1>
-                </div>
-                <!-- /.col-lg-12 -->
-            </div>
             <!-- /.row -->
-
             <!-- /.row -->
             <div class="row">
                 <div class="container col-md-12">
@@ -22,7 +12,6 @@
                             {{session()->get('message')}}
                         </div>
                     @endif
-
                 </div>
                 <div class="container col-md-12">
                     @if(session()->has('message1'))
@@ -30,7 +19,6 @@
                             {{session()->get('message1')}}
                         </div>
                     @endif
-
                 </div>
                 <div class="col-lg-12">
                     <div class="panel panel-default">
@@ -38,7 +26,7 @@
                             <a href="{{route('reception.index')}}" class="glyphicon glyphicon-arrow-left btn btn-info"></a>
                         </div>
                         <div class="panel-heading">
-                            <h3>Les details de la receotion : {{$codeReception}}</h3>
+                            <h3>Les details de la reception : {{$codeReception}}</h3>
                         </div>
                         <!-- /.panel-heading -->
                         <div class="panel-body">
@@ -65,7 +53,6 @@
                                 </table>
                             </section>
                             <!-- /.table-responsive -->
-
                         </div>
                         <!-- /.panel-body -->
                     </div>

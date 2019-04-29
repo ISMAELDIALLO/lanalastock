@@ -17,7 +17,7 @@ class CreateServicesTable extends Migration
             $table->increments('id');
             $table->string('codeService');
             $table->string('service');
-            //$table->integer('societes_id')->index()->foreign('societes_id')->references('id')->on('societes')->onDelete('cascade');
+            $table->integer('societes_id')->index()->foreign('societes_id')->references('id')->on('societes')->onDelete('cascade');
             $table->string('slug');
             $table->timestamps();
         });

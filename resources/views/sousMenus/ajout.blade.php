@@ -8,7 +8,7 @@
                 <div class="col-lg-12">
                     <div class="panel panel-default">
                         <div class="panel-heading text-center">
-                            <h3>Ajout d'un nouveau service</h3>
+                            <h3>Ajout d'un nouveau sous menu</h3>
                         </div>
                         <div class="panel-body">
                             <div class="row">

@@ -57,14 +57,14 @@ class SocieteController extends Controller
 
         $verification = Societe::where('nomSociete', $request->input('societe'))->first();
 
-        $pourcent = Societe::sum('pourcentage');
+       /* $pourcent = Societe::sum('pourcentage');
 
         $pourcent = $pourcent + $request->input('pourcentage');
 
         if ($pourcent > 100){
             Flashy::error('la somme des pourcentages ne doit pas depasser 100');
             return back();
-        }
+        }*/
         //dd($verification);
         if ($verification){
             Session::flash('societeExiste');
@@ -72,7 +72,6 @@ class SocieteController extends Controller
         }
         $societe = new Societe();
         $societe->nomSociete = $request->input('societe');
-        $societe->pourcentage = $request->input('pourcentage');
         $societe->slug = $request->input('societe').$date->format('Ymd');
         $societe->save();
 
@@ -136,7 +135,6 @@ class SocieteController extends Controller
 
         $societe = Societe::whereSlug($slug)->first();
         $societe->nomSociete = $request->input('societe');
-        $societe->pourcentage = $request->input('pourcentage');
         $societe->save();
 
         Flashy::success('Societe modifiee avec succes');

@@ -119,8 +119,8 @@ class DetailDemandeController extends Controller
 
         $msgGestionnaire = message::find(1)->messageGestionnaire;
         $msgSuperieur = message::find(1)->messageSuperieur;
-        $subject="Demande d'acquisition d'articles";
-        $messageSuperieur= auth()->user()->nom." ".auth()->user()->prenom." ".$msgSuperieur;
+        $subject = "Demande d'acquisition d'articles";
+        $messageSuperieur = auth()->user()->nom." ".auth()->user()->prenom." ".$msgSuperieur;
         $messageGestionnaire= auth()->user()->nom. " " .auth()->user()->prenom ." ".$msgGestionnaire." Numero demande : " . $dm;
         Mail::to($mailSuperieur)->send(new EnvoiMailSuperieur($subject,$messageSuperieur));
         Mail::to($mailGestionnaire)->send(new EnvoiMailGestionnaire($subject,$messageGestionnaire));

@@ -46,9 +46,20 @@ Route::resource('detailInventaire','DetailInventaireController');
 Route::resource('menu','MenuController');
 Route::resource('sousMenu','SousMenuController');
 Route::resource('abilitation','AbilitationController');
+Route::resource('detailProformat','DetailproformatController');
+Route::resource('temporaireProformat','TemporaireProformatController');
+Route::resource('proformat','ProformatController');
+Route::resource('traiteFacture','TraiteFactureProformat');
+Route::resource('superCategorie','SuperCategorieArticleController');
+Route::resource('cotation','CotationController');
+Route::resource('detailCotation','DetailCotationController');
+Route::resource('temporaireCotation','TemporaireCotationController');
 
 //La route qui ramene la vue aApprovisionner
 Route::get('/aApprovisionner', 'stockController@aApprovisionner')->name('aApprovisionner');
+Route::get('/regetterProformat/{id}', 'TraiteFactureProformat@rejettrerProformat')->name('rejettrerProformat');
+Route::get('/cration_de_la_commande/{id}', 'ligneDeCommandeController@createCommande')->name('bonDeCommande');
+Route::get('/condition_de_payement_de_la_commande/{id}', 'CommandeController@conditionPayement')->name('conditionPayement');
 
 //Routes pour l'importation d'une liste en excel
 Route::get('export', 'articleController@exportFile')->name('export');
@@ -59,7 +70,7 @@ Auth::routes();
 Route::get('/home', function () {
     if (auth()->user()){
         $demandes= nonConsult();
-        return view('index',compact('demandes'));
+        return view('pagePrincipal',compact('demandes'));
     }else{
         return redirect()->route('login');
     }

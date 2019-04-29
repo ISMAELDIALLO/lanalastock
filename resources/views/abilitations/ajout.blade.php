@@ -25,10 +25,10 @@
                                         {{csrf_field()}}
                                         <div class="col-lg-12">
                                             <div class="form-group">
-                                                <label for="utilisateur">UTILISATEUR</label>
+                                                <label for="utilisateur" class="glyphicon glyphicon-user">UTILISATEUR</label>
                                                 <select name="utilisateur" id="utilisateur" class="form-control">
                                                     @foreach($users as $user)
-                                                        <option value="{{$user->id}}">{{$user->email}}</option>
+                                                        <option value="{{$user->id}}" ><span class="glyphicon glyphicon-user"></span>{{$user->email}}</option>
                                                     @endforeach
                                                 </select>
                                                 {!! $errors->first('utilisateur','<span class="help-block alert-danger">:message</span>') !!}

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Article;
 use App\DetailSortieStock;
+use App\Fournisseur;
 use App\Motif;
 use App\SortieStock;
 use App\Stock;
@@ -52,8 +53,9 @@ class stockController extends Controller
 //            ->where('stocks.quaniteStock', '<=', 'articles.quantiteMinimum')
             ->select('stocks.*', 'articles.libelleArticle', 'articles.referenceArticle', 'articles.quantiteMinimum','articles.quantiteMaximum')
             ->get();
+        $fournisseurs = Fournisseur::all();
 
-        return view('stocks.aApprovisionner', compact('stocks', 'demandes'));
+        return view('stocks.aApprovisionner', compact('stocks', 'demandes','fournisseurs'));
     }
 
     /**

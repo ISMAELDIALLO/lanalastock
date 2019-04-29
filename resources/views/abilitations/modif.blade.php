@@ -8,7 +8,7 @@
                 <div class="col-lg-12">
                     <div class="panel panel-default">
                         <div class="panel-heading text-center">
-                            <h3>Formulaire de Modification</h3>
+                            <h4>Changement d'habilitation pour l'utilisateur</h4>
                         </div>
                         <div class="panel-body">
                             <div class="row">
@@ -38,7 +38,7 @@
                                                 <label for="sousMenu">SOUS MENU</label><br>
                                                 <select name="sousMenu" class="form-control" id="sousMenu">
                                                     @foreach($sousMenus as $sousMenu)
-                                                        <option value="{{$sousMenu->id}}" @if($sousMenu->id == $habilitations->sous_menu_id) selected @endif>{{$sousMenu->nomSousMenu}}<br>
+                                                        <option value="{{$sousMenu->id}}" @if($sousMenu->id == $habilitations->sous_menu_id) selected @endif>{{$sousMenu->lien}}</option>
                                                         <br>
                                                     @endforeach
                                                 </select>

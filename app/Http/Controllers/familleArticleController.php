@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\familleArticle;
 use App\Http\Requests\familleArticleFormResquest;
+use App\SuperCategorieArticle;
 use \DateTime;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -25,7 +26,11 @@ class familleArticleController extends Controller
 
         $demandes = nonConsult();
 
-        $familles=FamilleArticle::all();
+        $familles=DB::table('super_categorie_articles')
+            ->join('famille_articles','famille_articles.super_categories_id','=','super_categorie_articles.id')
+            ->select('super_categorie_articles.superCategorie','famille_articles.*')
+            ->get();
+
         return view('familleArticles.list',compact('familles', 'demandes'));
     }
 
@@ -42,7 +47,9 @@ class familleArticleController extends Controller
 
         $demandes = nonConsult();
 
-        return view('familleArticles.create', compact('demandes'));
+        $categories = SuperCategorieArticle::all();
+
+        return view('familleArticles.create', compact('demandes', 'categories'));
     }
 
     /**
@@ -77,6 +84,8 @@ class familleArticleController extends Controller
         //dd(max($familleArticles('')))
         $familleArticles->libelleFamilleArticle=$request->input('famille');
         $familleArticles->codeFamilleArticle=$co;
+        $familleArticles->super_categories_id = $request->input('categorie');
+        $familleArticles->typeImputation = $request->input('typeImputation');
         $familleArticles->slug=$request->input('famille').$date->format('YmdHis');
         $familleArticles->save();
 
@@ -109,10 +118,12 @@ class familleArticleController extends Controller
 
         $demandes = nonConsult();
 
+        $categories = SuperCategorieArticle::all();
+
         //$produit = Produit::where('Slug',$slug)->first();
        $familles=FamilleArticle::where('Slug',$slug)->first();
        // dd($familles);
-        return view('familleArticles.edit',compact('familles', 'demandes'));
+        return view('familleArticles.edit',compact('familles', 'demandes', 'categories'));
     }
 
     /**
@@ -139,6 +150,8 @@ class familleArticleController extends Controller
         }
 
         $familles=FamilleArticle::where('Slug',$slug)->first();
+        $familles->super_categories_id = $request->input('categorie');
+        $familles->typeImputation = $request->input('typeImputation');
         $familles->libelleFamilleArticle=$request->input('famille');
         $familles->save();
 

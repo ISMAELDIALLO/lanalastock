@@ -17,6 +17,9 @@ class CreateTableTemporairesTable extends Migration
             $table->increments('id');
             $table->integer('articles');
             $table->integer('quantite');
+            $table->double('prixUnitaire')->nullable();
+            $table->integer('fournisseurs_id')->nullable();
+            $table->integer('cotations_id')->nullable();
             $table->timestamps();
         });
     }

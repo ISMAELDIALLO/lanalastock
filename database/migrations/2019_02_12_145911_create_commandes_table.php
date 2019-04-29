@@ -16,6 +16,8 @@ class CreateCommandesTable extends Migration
         Schema::create('commandes', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('fournisseurs_id')->index()->foreign('fournisseurs_id')->references('id')->on('fournisseurs')->onDelete('cascade');
+            $table->integer('cotations_id')->index()->foreign('cotations_id')->references('id')->on('cotations')->onDelete('cascade');
+            $table->integer('users_id')->index()->foreign('users_id')->references('id')->on('users')->onDelete('cascade');
             $table->string('codeCommande');
             $table->date('dateCommande');
             $table->string('slug');

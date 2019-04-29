@@ -33,14 +33,6 @@
                                                     <span class="help-block alert-danger">Cette societe existe dejà</span>
                                                 @endif
                                             </div>
-                                            <div class="form-group">
-                                                <label for="pourcentage">POURCENTAGE</label>
-                                                <input class="form-control" name="pourcentage" value="{{$societe->pourcentage}}" id="pourcentage">
-                                                {!! $errors->first('pourcentage','<span class="help-block alert-danger">:message</span>') !!}
-                                                @if(Session::has('pourcentage'))
-                                                    <span class="help-block alert-danger">la somme des pourcentage ne doit pas depasser 100</span>
-                                                @endif
-                                            </div>
                                         </div>
                                         <div class="row container">
                                             <div class="col-lg-10 col-sm-10 col-md-10">

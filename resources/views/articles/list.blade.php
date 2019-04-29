@@ -7,9 +7,6 @@
 
         <div id="page-wrapper">
             <div class="row">
-                <div class="col-lg-12">
-                    <h1 class="page-header">Tableau</h1>
-                </div>
                 <!-- /.col-lg-12 -->
             </div>
             <!-- /.row -->
@@ -46,29 +43,32 @@
                                 <table width="100%" class="table table-striped table-bordered table-hover text-center" id="dataTables-example">
                                     <thead>
                                     <tr>
-                                        <th>FAMILLE</th>
-                                        <th>REFERENCE</th>
                                         <th>ARTICLE</th>
-                                        <th>QUANTITE MINIMUM</th>
-                                        <th>QUANTITE MAXIMUM</th>
-                                        <th>PRIX D'ACHAT</th>
-                                        <th>DATE INVENTAIRE</th>
-                                        <th>QUANTITE INVENTAIRE</th>
-                                        <th>Action</th>
-                                        <th>Action</th>
+                                        <th>QTE MIN</th>
+                                        <th>QTE MAX</th>
+                                        <th>PU</th>
+                                        <th>DATE INVENT.</th>
+                                        <th>QTE INVENT.</th>
+                                        <th>PERIODICITE PAYEMENT</th>
+                                        <th>DEBUT CONTRAT</th>
+                                        <th>FIN CONTRAT</th>
+                                        <th>MODIFIER</th>
+                                        <th>SUPPRIMER</th>
+                                        <th>RENOUVELER</th>
                                     </tr>
                                     </thead>
                                     <tbody>
                                     @foreach($articles as $article)
                                         <tr>
-                                            <td>{{$article->libelleFamilleArticle}}</td>
-                                            <td>{{$article->referenceArticle}}</td>
-                                            <td>{{$article->libelleArticle}}</td>
+                                            <td>{{$article->libelleFamilleArticle}} {{$article->referenceArticle}} {{$article->libelleArticle}}</td>
                                             <td>{{$article->quantiteMinimum}}</td>
                                             <td>{{$article->quantiteMaximum}}</td>
                                             <td>{{$article->dernierPrix}}</td>
                                             <td>{{$article->dateInventaire}}</td>
                                             <td>{{$article->quantiteInventaire}}</td>
+                                            <td>{{$article->periodicitePayement}}</td>
+                                            <td>{{$article->dateDebutContrat}}</td>
+                                            <td>{{$article->dateFinContrat}}</td>
                                             <td class="text-center">
                                                 <a href="{{route('article.edit',$article->slug)}}" class="btn btn-info fa fa-pencil-square-o btn-xl"></a>
                                             </td>
@@ -78,6 +78,9 @@
                                                     {{method_field('delete')}}
                                                     <button class="btn btn-danger fa fa-trash-o"></button>
                                                 </form>
+                                            </td>
+                                            <td class="text-center">
+                                                <a href="{{route('article.show',$article->slug)}}" class="btn btn-info glyphicon glyphicon-repeat btn-xl"></a>
                                             </td>
                                         </tr>
                                     @endforeach

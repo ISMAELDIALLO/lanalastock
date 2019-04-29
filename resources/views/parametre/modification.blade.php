@@ -27,6 +27,11 @@
                                                 <input class="form-control" name="email" value="{{$parametre->mailGestionnaire}}" id="email" TYPE="email">
                                                 {!!$errors->first('email','<span class="help-block alert-danger">:message</span>') !!}
                                             </div>
+                                            <div class="form-group">
+                                                <label for="email">MAIL DE L'AUDITAIRE</label>
+                                                <input class="form-control" name="mailAuditaire" value="{{$parametre->mailAuditaire}}" id="email" type="email">
+                                                {!!$errors->first('mailAuditaire','<span class="help-block alert-danger">:message</span>') !!}
+                                            </div>
                                         </div>
                                         <div class="row container">
                                             <div class="col-lg-10 col-sm-10 col-md-10">

@@ -32,8 +32,7 @@ class utilisateurController extends Controller
 
             $users =DB::table('services')
             ->join('users','users.services_id','=','services.id')
-            ->join('societe_services','services.id','=','societe_services.services_id')
-            ->join('societes','societes.id','=','societe_services.societes_id')
+            ->join('societes','societes.id','=','services.societes_id')
                 ->select('services.service','societes.nomSociete','users.*')->get();
             return view('utilisateurs.liste', compact('users', 'demandes'));
         }else{
@@ -56,8 +55,7 @@ class utilisateurController extends Controller
 
         $roles = Role::all();
         $societe_services=DB::table('societes')
-                  ->join('societe_services','societe_services.societes_id','=','societes.id')
-                  ->join('services','societe_services.services_id','=','services.id')
+                  ->join('services','societes.id','=','services.societes_id')
                   ->select('services.*','societes.nomSociete')
                   ->get();
         return view('utilisateurs.ajouter',compact('societe_services', 'demandes', 'roles'));
@@ -82,6 +80,7 @@ class utilisateurController extends Controller
         $utilisateurs->nom = $request->input('name');
         $utilisateurs->prenom = $request->input('prenom');
         $utilisateurs->email = $request->input('email');
+        $utilisateurs->nomSuperieur = $request->input('nomSuperieur');
         $utilisateurs->emailSuperieur = $request->input('emailSuperieur');
         $utilisateurs->services_id = $request->input('service');
         $utilisateurs->role = $request->input('role');
@@ -129,8 +128,7 @@ class utilisateurController extends Controller
         $demandes = nonConsult();
 
         $services=DB::table('societes')
-            ->join('societe_services','societes.id','=','societe_services.societes_id')
-            ->join('services','services.id','=','societe_services.services_id')
+            ->join('services','societes.id','=','services.societes_id')
             ->select('services.*','societes.nomSociete')
             ->get();
 
@@ -153,6 +151,7 @@ class utilisateurController extends Controller
         $users->nom = $request->input('name');
         $users->prenom = $request->input('prenom');
         $users->email = $request->input('email');
+        $users->nomSuperieur = $request->input('nomSuperieur');
         $users->emailSuperieur = $request->input('emailSuperieur');
         $users->role = $request->input('role');
         $users->services_id=$request->input('service');

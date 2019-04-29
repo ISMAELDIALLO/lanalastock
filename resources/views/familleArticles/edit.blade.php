@@ -16,6 +16,23 @@
                                     {{method_field('PUT')}}
                                     <div class="col-lg-12">
                                         <div class="form-group">
+                                            <label for="famille"> SUPER CATEGORIE ARTICLE</label>
+                                            <select name="categorie" id="categorie" class="form-control">
+                                                @foreach($categories as $categorie)
+                                                    <option value="{{$categorie->id}}">{{$categorie->superCategorie}}</option>
+                                                @endforeach
+                                            </select>
+                                            {!! $errors->first('categorie','<span class="help-block">:message</span>') !!}
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="typeImputation"> TYPE IMPUTATION</label>
+                                            <select name="typeImputation" id="typeImputation" class="form-control">
+                                                    <option value="immo">IMMOBILISATION</option>
+                                                    <option value="moyensGeneraux">MOYENS GENERAUX</option>
+                                            </select>
+                                            {!! $errors->first('categorie','<span class="help-block">:message</span>') !!}
+                                        </div>
+                                        <div class="form-group">
                                             <label for="famille">FAMILLE</label>
                                             <input class="form-control" id="famille" type="text" name="famille" value="{{$familles->libelleFamilleArticle}}">
                                             {!! $errors->first('famille','<span class="help-block alert-danger">:message</span>') !!}

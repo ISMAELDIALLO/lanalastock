@@ -20,16 +20,16 @@
                                     @endif
 
                                 </div>
-                                <div class="col-lg-4 col-sm-4 col-md-offset-4">
+                                <div class="col-lg-10 col-sm-12 col-md-10 col-md-offset-1">
                                     <form action="{{route('article.update',$articles->slug)}}" method="post">
                                         {{csrf_field()}}
                                         {{method_field('PUT')}}
-                                        <div class="col-lg-12">
+                                        <div class="col-lg-6">
                                             <div class="form-group">
                                                 <label for="famille">FAMILLE ARTICLE</label>
                                                 <select name="famille" id="famille" class="form-control">
                                                     @foreach($familles as $famille)
-                                                        <option value="{{$famille->id}}" @if($famille->id == $articles->famille_articles_id) selected @endif>{{$famille->libelleFamilleArticle}}</option>
+                                                        <option value="{{$famille->id}}" @if($famille->id == $articles->famille_articles_id) selected @endif>{{$famille->superCategorie}} {{$famille->libelleFamilleArticle}}</option>
                                                     @endforeach
                                                 </select>
                                                 {!! $errors->first('famille','<span class="help-block alert-danger">:message</span>') !!}
@@ -52,8 +52,31 @@
                                                 <input class="form-control" name="quantitemaximum" value="{{ $articles->quantiteMaximum }}" id="quantitemaximum">
                                                 {!! $errors->first('quantitemaximum','<span class="help-block alert-danger">:message</span>') !!}
                                             </div>
+                                        </div>
+                                        <div class="col-lg-6">
                                             <div class="form-group">
-                                                <label for="dernierPrix">PRIX D'ACHAT</label>
+                                                <label for="periodicitePayement">PERIODICITE DE PAYEMENT DU CONTRAT</label>
+                                                <select name="periodicitePayement" id="periodicitePayement" class="form-control">
+                                                    <option value="">__select__</option>
+                                                    <option value="mensuel">MENSUEL</option>
+                                                    <option value="trimestriel">TRIMESTRIEL</option>
+                                                    <option value="trimestriel">SEMESTRIEL</option>
+                                                    <option value="mensuel">ANNUEL</option>
+                                                </select>
+                                                {!! $errors->first('periodicitePayement','<span class="help-block alert-danger">:message</span>') !!}
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="dateDebutContrat">DATE DEBUT CONTRAT</label>
+                                                <input type="date" class="form-control" name="dateDebutContrat" value="{{ old('dateDebutContrat') }}" id="dateDebutContrat">
+                                                {!! $errors->first('dateDebutContrat','<span class="help-block alert-danger">:message</span>') !!}
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="dateFinContrat">DATE FIN CONTRAT</label>
+                                                <input type="date" class="form-control" name="dateFinContrat" value="{{ old('dateFinContrat') }}" id="dateFinContrat">
+                                                {!! $errors->first('dateFinContrat','<span class="help-block alert-danger">:message</span>') !!}
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="dernierPrix">PRIX UNITAIRE</label>
                                                 <input class="form-control" name="dernierPrix" value="{{ $articles->dernierPrix }}" id="dernierPrix">
                                                 {!! $errors->first('dernierPrix','<span class="help-block alert-danger">:message</span>') !!}
                                             </div>

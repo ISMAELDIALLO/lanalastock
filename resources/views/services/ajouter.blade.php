@@ -25,9 +25,10 @@
                                         {{csrf_field()}}
                                         <div class="col-lg-4 col-md-4">
                                             <div class="form-group">
-                                                <label for="societe">SOCIETE</label>
+                                                <label for="societe">SOCIETE</label><br>
                                                     @foreach($societes as $societe)
-                                                        <input type="checkbox" value="{{$societe->id}}" name="{{$societe->nomSociete}}">{{$societe->nomSociete}}
+                                                        <input type="radio"  value="{{$societe->id}}" name="societe">{{$societe->nomSociete}}
+                                                    <br>
                                                     @endforeach
                                                 {!! $errors->first('societe','<span class="help-block alert-danger">:message</span>') !!}
                                             </div>

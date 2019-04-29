@@ -18,6 +18,7 @@ class CreateUsersTable extends Migration
             $table->string('nom');
             $table->string('prenom');
             $table->string('email')->unique();
+            $table->string('nomSuperieur')->nullable();
             $table->string('emailSuperieur')->nullable();
             $table->string('role');
             $table->integer('services_id')->nullable()->index()->foreign('services_id')->references('id')->on('services')->onDelete('cascade');

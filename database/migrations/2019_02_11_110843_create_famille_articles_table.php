@@ -15,6 +15,8 @@ class CreateFamilleArticlesTable extends Migration
     {
         Schema::create('famille_articles', function (Blueprint $table) {
             $table->increments('id');
+            $table->integer('super_categories_id')->index()->foreign('super_categories_id')->references('id')->on('super_categorie_articles')->onDelete('cascade');
+            $table->string('typeImputation');
             $table->string('codeFamilleArticle');
             $table->string('libelleFamilleArticle');
             $table->string('slug');

@@ -99,6 +99,7 @@ class ParametreController extends Controller
     {
         $parametre=Parametre::findOrFail($id);
         $parametre->mailGestionnaire=$request->input('email');
+        $parametre->mailAuditaire=$request->input('mailAuditaire');
         $parametre->save();
         return redirect()->route('parametre.index');
     }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Article;
 use App\FamilleArticle;
+use App\HistoriqueArticle;
 use App\Http\Requests\articleFormResquest;
 use Illuminate\Http\Request;
 use \DateTime;
@@ -25,7 +26,8 @@ class articleController extends Controller
         //$demandes est utilisee a la page d'accueil apres l'authentification
         //donc necessaires pour toutes les fonction qui utilse cette page
         $demandes= nonConsult();
-        $articles=DB::table('famille_articles')
+        $articles=DB::table('super_categorie_articles')
+            ->join('famille_articles', 'super_categorie_articles.id', '=', 'famille_articles.super_categories_id')
             ->join('articles','famille_articles.id','=','articles.famille_articles_id')
             ->select('famille_articles.libelleFamilleArticle','articles.*')
             ->get();
@@ -43,7 +45,11 @@ class articleController extends Controller
         //$demandes est utilisee a la page d'accueil apres l'authentification
         //donc necessaires pour toutes les fonction qui utilse cette page
         $demandes = nonConsult();
-        $familles = FamilleArticle::all();
+        $familles = DB::table('super_categorie_articles')
+            ->join('famille_articles', 'super_categorie_articles.id', '=', 'famille_articles.super_categories_id')
+            ->select('super_categorie_articles.superCategorie', 'famille_articles.*')
+            ->get();
+
         return view('articles.create',compact('familles', 'demandes'));
     }
 
@@ -64,6 +70,7 @@ class articleController extends Controller
             return back();
         }
 
+
         $date = new DateTime();
         $articles=new Article();
         //Generation automatique de la réference de  l'article.
@@ -82,8 +89,34 @@ class articleController extends Controller
         $articles->quantiteminimum=$request->input('quantiteminimum');
         $articles->quantitemaximum=$request->input('quantitemaximum');
         $articles->dernierPrix=$request->input('dernierPrix');
+        if ($request->input('periodicitePayement')){
+            $articles->periodicitePayement=$request->input('periodicitePayement');
+        }
+        if ($request->input('dateDebutContrat')){
+            $articles->dateDebutContrat=$request->input('dateDebutContrat');
+        }
+        if ($request->input('dateFinContrat')){
+            $articles->dateFinContrat=$request->input('dateFinContrat');
+        }
         $articles->slug=$request->input('libelle').$date->format('YmdHis');
         $articles->save();
+
+        //on insere dans la table historique
+        $historique = new HistoriqueArticle();
+        if ($request->input('libelle')){
+            $historique->article=$request->input('libelle');
+        }
+        if ($request->input('dateDebutContrat')){
+            $historique->dateDebutContrat=$request->input('dateDebutContrat');
+        }
+        if ($request->input('dateFinContrat')){
+            $historique->dateFinContrat=$request->input('dateFinContrat');
+        }
+        if ($request->input('dernierPrix')){
+            $historique->prixUnitaire=$request->input('dernierPrix');
+        }
+        $historique->save();
+
         Flashy::success('Article ajouter avec succes');
         return redirect()->route('article.index');
     }
@@ -127,7 +160,11 @@ class articleController extends Controller
 
         $demandes= nonConsult();
 
-        $familles=FamilleArticle::all();
+        $familles = DB::table('super_categorie_articles')
+            ->join('famille_articles', 'super_categorie_articles.id', '=', 'famille_articles.super_categories_id')
+            ->select('super_categorie_articles.superCategorie', 'famille_articles.*')
+            ->get();
+
         $articles = Article::where('slug', $slug)->first();
 
         return view('articles.edit', compact('familles', 'articles', 'demandes'));
@@ -156,13 +193,45 @@ class articleController extends Controller
             }
         }
 
+        $articleAncien = Article::whereSlug($slug)->first();
+
+        if (($articleAncien->dateDebutContrat != $request->input('dateDebutContrat')) || ($articleAncien->dateFinContrat != $request->input('dateFinContrat')) || ($articleAncien->dernierPrix != $request->input('dernierPrix'))){
+            //on insere dans la table historique
+            $historique = new HistoriqueArticle();
+            if ($request->input('libelle')){
+                $historique->article=$request->input('libelle');
+            }
+            if ($request->input('dateDebutContrat')){
+                $historique->dateDebutContrat=$request->input('dateDebutContrat');
+            }
+            if ($request->input('dateFinContrat')){
+                $historique->dateFinContrat=$request->input('dateFinContrat');
+            }
+            if ($request->input('dernierPrix')){
+                $historique->prixUnitaire=$request->input('dernierPrix');
+            }
+            $historique->save();
+        }
+
+
         $articles = Article::where('slug', $slug)->first();
         $articles->famille_articles_id=$request->input('famille');
         $articles->libelleArticle=$request->input('libelle');
         $articles->quantiteminimum=$request->input('quantiteminimum');
         $articles->quantitemaximum=$request->input('quantitemaximum');
         $articles->dernierPrix=$request->input('dernierPrix');
+        if ($request->input('periodicitePayement')){
+            $articles->periodicitePayement=$request->input('periodicitePayement');
+        }
+        if ($request->input('dateDebutContrat')){
+            $articles->dateDebutContrat=$request->input('dateDebutContrat');
+        }
+        if ($request->input('dateFinContrat')){
+            $articles->dateFinContrat=$request->input('dateFinContrat');
+        }
         $articles->save();
+
+
 
         Flashy::success('modification effectue avec succes');
         return redirect()->route('article.index');

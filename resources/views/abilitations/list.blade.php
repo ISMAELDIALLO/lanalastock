@@ -6,12 +6,6 @@
 
 
         <div id="page-wrapper">
-            <div class="row">
-                <div class="col-lg-12">
-                    <h1 class="page-header">Tableau</h1>
-                </div>
-                <!-- /.col-lg-12 -->
-            </div>
             <!-- /.row -->
 
             <!-- /.row -->
@@ -38,7 +32,7 @@
                             <a href="{{route('abilitation.create')}}" class="btn btn-info fa fa-plus-circle btn-xl">NOUVELLE HABILITATION</a>
                         </div>
                         <div class="panel-heading">
-                            Liste des Habilitations
+                            Liste des Utilisateurs qu'on solicite donner des habilitations
                         </div>
                         <!-- /.panel-heading -->
                         <div class="panel-body">
@@ -46,26 +40,18 @@
                                 <table width="100%" class="table table-striped table-bordered table-hover text-center" id="dataTables-example">
                                     <thead>
                                     <tr>
-                                        <th>UTILISATEURS</th>
-                                        <th>SOUS MENUS</th>
-                                        <th>MODIFIER</th>
-                                        <th>SUPPRIMER</th>
+                                        <th class="text-center">UTILISATEURS</th>
+                                        <th class="text-center">ROLE</th>
+                                        <th class="text-center">HABILITATIONS</th>
                                     </tr>
                                     </thead>
                                     <tbody>
                                     @foreach($habilitations as $habilitation)
                                         <tr>
                                             <td>{{$habilitation->nom}} {{$habilitation->prenom}} {{$habilitation->email}}</td>
-                                            <td>{{$habilitation->nomSousMenu}}</td>
+                                            <td>{{$habilitation->role}}</td>
                                             <td class="text-center">
-                                                <a href="{{route('abilitation.edit',$habilitation->id)}}" class="btn btn-info fa fa-pencil-square-o btn-xl"></a>
-                                            </td>
-                                            <td class="text-center">
-                                                <form action="{{route('abilitation.destroy',$habilitation->id)}}" method="post">
-                                                    {{csrf_field()}}
-                                                    {{method_field('delete')}}
-                                                    <button class="btn btn-danger fa fa-trash-o"></button>
-                                                </form>
+                                                <a href="{{route('abilitation.show',$habilitation->id)}}" class="btn btn-info fa fa-list btn-xl"></a>
                                             </td>
                                         </tr>
                                     @endforeach

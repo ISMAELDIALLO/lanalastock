@@ -25,11 +25,8 @@ class AbilitationController extends Controller
         //$demandes est utilisee a la page d'accueil apres l'authentification
         //donc necessaires pour toutes les fonction qui utilse cette page
         $demandes= nonConsult();
-        $habilitations = DB::table('users')
-                ->join('abilitations','users.id','=','abilitations.users_id')
-                ->join('sous_menus','sous_menus.id','=','abilitations.sous_menu_id')
-                ->select('sous_menus.nomSousMenu','users.nom','users.prenom','users.email','abilitations.*')
-                ->get();
+
+        $habilitations = User::all();
         return view('abilitations.list',compact('demandes','habilitations'));
     }
 
@@ -43,6 +40,7 @@ class AbilitationController extends Controller
         //nonConsult() est une methode helper qui retourne l'ensemble des comandes non consultees
         //$demandes est utilisee a la page d'accueil apres l'authentification
         //donc necessaires pour toutes les fonction qui utilse cette page
+
         $demandes= nonConsult();
 
         $users = User::all();
@@ -65,48 +63,56 @@ class AbilitationController extends Controller
         $nomSousMenu = "";
         foreach ($sousMenus as $sousMenu) {
             if ($request->input($sousMenu->id)){
-                $nomSousMenu = $request->input($sousMenu->id);
-                $users = User::where('id',$request->input('utilisateur'))->first();
-                if ($users){
-                    $idU = $users->id;
+                if ($request->input('utilisateur')){
                     $verif = Abilitation::where([
                         'sous_menu_id' =>$request->input($sousMenu->id),
-                        'users_id' =>$idU,
+                        'users_id' =>$request->input('utilisateur'),
                     ])->first();
-                    if ($verif){
-                        Session::flash('doublons');
-                        return back();
+                    if (!$verif){
+                        $nomSousMenu = $request->input($sousMenu->id);
+                        $abilitations = new Abilitation();
+                        $abilitations->users_id = $request->input('utilisateur');
+                        $abilitations->sous_menu_id = $nomSousMenu;
+                        $abilitations->save();
                     }
                 }
-            }
-        }
-        if (!$nomSousMenu){
-            Flashy::error('Veuillez selectionner un sous menu');
-            return back();
-        }
-
-        foreach ($sousMenus as $sousMenu) {
-            if ($request->input($sousMenu->id)){
-                $nomSousMenu = $request->input($sousMenu->id);
-                $abilitations = new Abilitation();
-                $abilitations->users_id = $request->input('utilisateur');
-                $abilitations->sous_menu_id = $nomSousMenu;
-                $abilitations->save();
             }
         }
 
         return redirect()->route('abilitation.index');
     }
-
     /**
      * Display the specified resource.
      *
      * @param  \App\Abilitation  $abilitation
      * @return \Illuminate\Http\Response
      */
-    public function show(Abilitation $abilitation)
+    public function show($id)
     {
-        //
+        //nonConsult() est une methode helper qui retourne l'ensemble des comandes non consultees
+        //$demandes est utilisee a la page d'accueil apres l'authentification
+        //donc necessaires pour toutes les fonction qui utilse cette page
+        $demandes= nonConsult();
+
+        // Les habilitations liées à un utilisateur
+
+        $users = User::findOrFail($id);
+        $users_id = $users->id;
+        $habilitations = DB::table('users')
+            ->join('abilitations','users.id','=','abilitations.users_id')
+            ->join('sous_menus','sous_menus.id','=','abilitations.sous_menu_id')
+            ->select('sous_menus.nomSousMenu','sous_menus.lien','users.nom','users.prenom','users.email','abilitations.*')
+            ->where('users.id',$users_id)
+            ->get();
+        $nomUtilisateur = "";
+        $prenomUtilisateur = "";
+        $emailUtilisateur = "";
+        foreach ($habilitations as $habilitation){
+            $nomUtilisateur = $habilitation->nom;
+            $prenomUtilisateur = $habilitation->prenom;
+            $emailUtilisateur = $habilitation->email;
+        }
+        return view('abilitations.details',compact('habilitations','demandes','nomUtilisateur','prenomUtilisateur','emailUtilisateur'));
     }
 
     /**
@@ -170,6 +176,6 @@ class AbilitationController extends Controller
         $abilitations = Abilitation::findOrFail($id);
         $abilitations->delete();
         Flashy::error('Suppression effectuez avec succes');
-        return redirect()->route('abilitation.index');
+        return back();
     }
 }

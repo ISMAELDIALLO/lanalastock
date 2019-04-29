@@ -57,6 +57,19 @@
                                     @endif
                                 </div>
                             </div>
+                            <div class="form-group">
+                                <label for="nomSuperieur" class="col-md-4 control-label">PRENOMS & NOM DU SUPERIEUR </label>
+
+                                <div class="col-md-6">
+                                    <input id="nomSuperieur" type="text" class="form-control" name="nomSuperieur" value="{{ old('nomSuperieur') }}" required>
+
+                                    @if ($errors->has('nomSuperieur'))
+                                        <span class="help-block">
+                                        <strong>{{ $errors->first('nomSuperieur') }}</strong>
+                                    </span>
+                                    @endif
+                                </div>
+                            </div>
                             <div class="form-group{{ $errors->has('emailSuperieur') ? ' has-error' : '' }}">
                                 <label for="emailSuperieur" class="col-md-4 control-label">Mail du seperieur</label>
                                 <div class="col-md-6">

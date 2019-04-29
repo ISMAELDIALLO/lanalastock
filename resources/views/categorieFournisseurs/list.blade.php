@@ -6,15 +6,7 @@
 
 
         <div id="page-wrapper">
-            <div class="row">
-                <div class="col-lg-12">
-                    <h1 class="page-header">Tableau</h1>
-                </div>
-                <!-- /.col-lg-12 -->
-            </div>
-            <!-- /.row -->
 
-            <!-- /.row -->
             <div class="row">
                 <div class="container col-md-12">
                     @if(session()->has('message'))
@@ -34,7 +26,7 @@
                 </div>
                 <div class="col-lg-8 col-md-8 col-md-offset-2">
                     <div class="panel panel-default">
-                        <div class="col col-lg-offset-9">
+                        <div class="col col-lg-offset-8">
                             <a href="{{route('categorieFournisseur.create')}}" class="btn btn-info fa fa-plus-circle btn-xl">NOUVELLE CATEGORIE</a>
                         </div>
                         <div class="panel-heading">

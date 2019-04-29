@@ -29,9 +29,8 @@ class ServiceController extends Controller
         $demandes = nonConsult();
 
         $services=DB::table('societes')
-            ->join('societe_services', 'societes.id', '=', 'societe_services.societes_id')
-            ->join('services', 'services.id', '=', 'societe_services.services_id')
-            ->select('societes.nomSociete', 'societes.pourcentage', 'services.*')
+            ->join('services', 'services.societes_id', '=', 'societes.id')
+            ->select('societes.nomSociete', 'services.*')
             ->get();
         return view('services.list',compact('services', 'demandes'));
     }
@@ -65,7 +64,7 @@ class ServiceController extends Controller
         $societes = Societe::all();
         //dd($societes);
         //La
-        $nomS = "";
+        /*$nomS = "";
         foreach ($societes as $societe){
             if ($request->input($societe->nomSociete)){
                 $nomS = $request->input($societe->nomSociete);
@@ -90,6 +89,7 @@ class ServiceController extends Controller
             Flashy::error('Veuillez selectionner au moins une societe');
             return back();
         }
+        */
 
         $date=new DateTime();
         $servs=Service::select(DB::raw("CONCAT('CS0', MAX(CAST(RIGHT(codeService,LENGTH(codeService)-3) AS UNSIGNED))+1) AS code"))
@@ -101,13 +101,27 @@ class ServiceController extends Controller
             }
         }
 
+        $societe = Societe::findOrFail($request->input('societe'));
+        if ($societe){
+            $verification = Service::where([
+                'societes_id' => $request->input('societe'),
+                'service'=> $request->input('service'),
+            ])->first();
+
+            if ($verification){
+                Session::flash('serviceExiste');
+                return back();
+            }
+        }
+
         $service = new Service();
         $service->codeService=$ser;
         $service->service=$request->input('service');
+        $service->societes_id = $request->input('societe');
         $service->slug=$ser.$date->format('YmdHis');
         $service->save();
 
-        $idService = Service::max('id');
+       /* $idService = Service::max('id');
 
         foreach ($societes as $societe){
             if ($request->input($societe->nomSociete)){
@@ -116,7 +130,7 @@ class ServiceController extends Controller
                 $societeService->services_id = $idService;
                 $societeService->save();
             }
-        }
+        }*/
 
         Flashy::success('Service enregistrer avec succes');
         return redirect()->route('service.index');

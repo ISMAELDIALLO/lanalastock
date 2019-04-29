@@ -34,7 +34,7 @@
                 </div>
                 <div class="col-lg-12">
                     <div class="panel panel-default">
-                        <div class="col col-lg-offset-10">
+                        <div class="col col-lg-offset-9 col-md-offset-9">
                             <a href="{{route('ligneDeCommande.create')}}" class="btn btn-info fa fa-plus-circle btn-xl">NOUVELLE COMMANDE</a>
                         </div>
                         <div class="panel-heading">

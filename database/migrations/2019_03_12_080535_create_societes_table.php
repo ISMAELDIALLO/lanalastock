@@ -16,7 +16,6 @@ class CreateSocietesTable extends Migration
         Schema::create('societes', function (Blueprint $table) {
             $table->increments('id');
             $table->string('nomSociete');
-            $table->float('pourcentage');
             $table->string('slug');
             $table->timestamps();
         });

@@ -24,13 +24,15 @@ class serviceFormResquest extends FormRequest
     public function rules()
     {
         return [
-            'service'=>'required'
+            'service'=>'required',
+            'societe'=>'required'
         ];
     }
     public  function messages()
     {
         return [
             'service.required'=>'Le service est obligatoire',
+            'societe.required'=>'La societe est obligatoire'
         ];
     }
 }

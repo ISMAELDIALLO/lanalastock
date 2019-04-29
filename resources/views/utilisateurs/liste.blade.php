@@ -6,12 +6,6 @@
 
 
         <div id="page-wrapper">
-            <div class="row">
-                <div class="col-lg-12">
-                    <h1 class="page-header">Tableau</h1>
-                </div>
-                <!-- /.col-lg-12 -->
-            </div>
             <!-- /.row -->
 
             <!-- /.row -->
@@ -46,9 +40,9 @@
                                 <table width="100%" class="table table-striped table-bordered text-center table-hover" id="dataTables-example">
                                     <thead>
                                     <tr>
-                                        <th>NOM & PRENOM</th>
+                                        <th>NOM & PRENOMS</th>
                                         <th>EMAIL</th>
-                                        <th>EMAIL DU SUPERIEUR</th>
+                                        <th>NOM & PRENOMS DU SUPERIEUR</th>
                                         <th>ROLE</th>
                                         <th>SERVICE</th>
                                         <th>ETAT</th>
@@ -61,7 +55,7 @@
                                         <tr>
                                             <td>{{$user->nom}} {{$user->prenom}}</td>
                                             <td>{{$user->email}}</td>
-                                            <td>{{$user->emailSuperieur}}</td>
+                                            <td>{{$user->nomSuperieur}}</td>
                                             <td>{{$user->role}}</td>
                                             <td>{{$user->service}} - {{$user->nomSociete}}</td>
                                             <td>
