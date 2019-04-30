@@ -28,11 +28,9 @@
                 </div>
                 <div class="col-lg-12">
                     <div class="panel panel-default">
-                        <div class="col col-lg-offset-9">
-                            <a href="{{route('commandeSpecifique')}}" class="fa fa-plus-circle btn-xl">Commande Sans Cotation</a>
-                        </div>
                         <div class="panel-heading">
-                            Liste des commandes
+                            Liste des commandes sans cotation
+                            <a href="{{route('commande.index')}}" class="col-md-offset-9"> Liste des commandes avec cotation</a>
                         </div>
                         <!-- /.panel-heading -->
                         <div class="panel-body">
@@ -40,7 +38,6 @@
                                 <table width="100%" class="table table-striped table-bordered table-hover text-center" id="dataTables-example">
                                     <thead>
                                     <tr>
-                                        <th class="text-center">COTATION</th>
                                         <th class="text-center">COMMANDE</th>
                                         <th class="text-center">DATE COMMANDE</th>
                                         <th class="text-center">SOCIETE</th>
@@ -53,7 +50,6 @@
                                     <tbody>
                                     @foreach($commandes as $commande)
                                         <tr>
-                                            <td>{{$commande->codeCotation}}</td>
                                             <td>{{$commande->codeCommande}}</td>
                                             <td>{{$commande->dateCommande}}</td>
                                             <td>{{$commande->nomSociete}}</td>
@@ -75,11 +71,7 @@
                             </section>
                             <br>
                             <!-- /.table-responsive -->
-                            @if($comm == 0)
-                            <a href="{{route('commande.index')}}">Toutes les commandes</a>
-                                @else
-                                <a href="{{route('derniereCotation')}}">Commandes Recentes</a>
-                            @endif
+                                <a href="{{route('commande.create')}}">Creer une commande sans cotation</a>
                         </div>
                         <!-- /.panel-body -->
                     </div>

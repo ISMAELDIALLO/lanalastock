@@ -146,9 +146,9 @@ class DetailReceptionController extends Controller
      * @param  \App\DetailReception  $detailReception
      * @return \Illuminate\Http\Response
      */
-    public function show(DetailReception $detailReception)
+    public function show($id)
     {
-        //
+
     }
 
     /**

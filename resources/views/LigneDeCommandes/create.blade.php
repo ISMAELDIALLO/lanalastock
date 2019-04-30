@@ -52,7 +52,7 @@
                                                                     <td>
                                                                         <select name="{{'fournisseur'}}{{$ligne->id}}" id="" class="form-control">
                                                                             @foreach($fournisseurs as $fournisseur)
-                                                                                <option value="{{$fournisseur->id}}" class="form-control">{{$fournisseur->nomSociete}}{{$fournisseur->nomDuContact}}{{$fournisseur->prenomDuContact}}</option>
+                                                                                <option value="{{$fournisseur->id}}" class="form-control">{{$fournisseur->nomSociete}} {{$fournisseur->nomDuContact}} {{$fournisseur->prenomDuContact}}</option>
                                                                             @endforeach
                                                                         </select>
                                                                     </td>

@@ -8,6 +8,8 @@ use App\Stock;
 use App\tableTemporaire;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
+use DateTime;
+use MercurySeries\Flashy\Flashy;
 
 class tableTemporaireController extends Controller
 {
@@ -44,7 +46,7 @@ class tableTemporaireController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(temporaireFormRequest $request)
+    public function store(Request $request)
     {
         //verification dans la table article si la quantite maximun n'a pas ete atteinte
         $quantiteStock = 0; //la quantite en stock
@@ -65,11 +67,20 @@ class tableTemporaireController extends Controller
             return back();
         }
 
+        if (!$request->input('quantite')){
+            Flashy::error('La quantite est requise');
+            return back();
+        }else if (!$request->input('prixUnitaire')){
+            Flashy::error('Le prix unitaire est obligatoire');
+            return back();
+        }
         $lignes=new tableTemporaire();
-        $lignes->articles=$request->input('article');
-        $lignes->quantite=$request->input('quantite');
+        $lignes->articles = $request->input('article');
+        $lignes->quantite = $request->input('quantite');
+        $lignes->prixUnitaire = $request->input('prixUnitaire');
+        $lignes->users_id = auth()->user()->id;
         $lignes->save();
-        return redirect()->route('ligneDeCommande.create');
+        return redirect()->route('commande.create');
     }
 
     /**
@@ -145,12 +156,8 @@ class tableTemporaireController extends Controller
      */
     public function destroy($id)
     {
-        /*
-         * $articles=Article::where('slug', $slug)->first();
-        $articles->delete();
-         */
         $temporaires=tableTemporaire::findOrFail($id);
         $temporaires->delete();
-        return redirect()->route('ligneDeCommande.create');
+        return redirect()->route('commande.create');
     }
 }

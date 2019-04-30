@@ -2,9 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Article;
 use App\Commande;
+use App\Cotation;
 use App\Fournisseur;
 use App\Http\Requests\commandeFormResquest;
+use App\LineDeCommande;
+use App\tableTemporaire;
 use \DateTime;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -32,9 +36,46 @@ class CommandeController extends Controller
             ->select('fournisseurs.nomSociete','fournisseurs.nomDuContact','fournisseurs.prenomDuContact','fournisseurs.telephoneDuContact',
                 'cotations.codeCotation','commandes.*')
             ->get();
-        return view('commandes.liste',compact('commandes', 'demandes'));
+        $comm = 1;
+        return view('commandes.liste',compact('commandes', 'demandes','comm'));
     }
 
+    public function listeDerniereCotation(){
+        //nonConsult() est une methode helper qui retourne l'ensemble des comandes non consultees
+        //$demandes est utilisee a la page d'accueil apres l'authentification
+        //donc necessaires pour toutes les fonction qui utilse cette page
+
+        $demandes = nonConsult();
+
+        $commandes=DB::table('fournisseurs')
+            ->join('commandes','fournisseurs.id','=','commandes.fournisseurs_id')
+            ->join('cotations', 'cotations.id', '=', 'commandes.cotations_id')
+            ->select('fournisseurs.nomSociete','fournisseurs.nomDuContact','fournisseurs.prenomDuContact','fournisseurs.telephoneDuContact',
+                'cotations.codeCotation','commandes.*')
+            ->where('commandes.cotations_id','=',Cotation::max('id'))
+            ->get();
+
+        $comm = 0;
+        return view('commandes.liste',compact('commandes', 'demandes','comm'));
+    }
+
+    public function listCommandeSpecifique(){
+        //nonConsult() est une methode helper qui retourne l'ensemble des comandes non consultees
+        //$demandes est utilisee a la page d'accueil apres l'authentification
+        //donc necessaires pour toutes les fonction qui utilse cette page
+
+        $demandes = nonConsult();
+
+        $commandes=DB::table('fournisseurs')
+            ->join('commandes','fournisseurs.id','=','commandes.fournisseurs_id')
+            ->where('commandes.cotations_id', '=', null)
+            ->select('fournisseurs.nomSociete','fournisseurs.nomDuContact','fournisseurs.prenomDuContact',
+                'fournisseurs.telephoneDuContact', 'commandes.*')
+            ->get();
+
+        return view('commandes.listCommandeSansCotation', compact('demandes', 'commandes'));
+
+    }
     /**
      * Show the form for creating a new resource.
      *
@@ -48,9 +89,18 @@ class CommandeController extends Controller
 
         $demandes = nonConsult();
 
-        $fournisseurs=Fournisseur::all();
-        return view('commandes.create',compact('fournisseurs', 'demandes'));
+        $fournisseurs = Fournisseur::all();
+
+        $articles = Article::all();
+
+        $lignes = DB::table('articles')
+                ->join('table_temporaires','table_temporaires.articles','=','articles.id')
+                ->select('articles.libelleArticle','articles.referenceArticle','table_temporaires.*')
+                ->get();
+
+        return view('commandes.commandeSansCotation',compact('fournisseurs', 'demandes','articles','lignes'));
     }
+
 
     /**
      * Store a newly created resource in storage.
@@ -58,7 +108,7 @@ class CommandeController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(commandeFormResquest $request)
+    public function store(Request $request)
     {
         $coms=Commande::select(DB::raw("CONCAT('CM0', MAX(CAST(RIGHT(codeCommande,LENGTH(codeCommande)-3) AS UNSIGNED))+1) AS code"))
             ->get();
@@ -72,9 +122,26 @@ class CommandeController extends Controller
         $commandes=new Commande();
         $commandes->fournisseurs_id=$request->input('fournisseur');
         $commandes->codeCommande=$cm;
-        $commandes->dateCommande=$request->input('dateCommande');
+        $commandes->users_id = auth()->user()->id;
+        $commandes->dateCommande = $date->format('Y-m-d');
         $commandes->slug=$request->input('dateCommande').$date->format('YmdHis');
         $commandes->save();
+
+        $idCommande = Commande::max('id');
+
+        $temporaireCommandes = tableTemporaire::all();
+
+        foreach ($temporaireCommandes as $temporaireCommande){
+            $lineCommande = new LineDeCommande();
+            $lineCommande->commandes_id = $idCommande;
+            $lineCommande->articles_id = $temporaireCommande->articles;
+            $lineCommande->quantite = $temporaireCommande->quantite;
+            $lineCommande->prixUnitaire = $temporaireCommande->prixUnitaire;
+            $lineCommande->slug = $date;
+            $lineCommande->save();
+        }
+
+        tableTemporaire::truncate();
         return back();
     }
 
@@ -92,20 +159,18 @@ class CommandeController extends Controller
 
         $demandes = nonConsult();
 
-        $details = DB::table('cotations')
-            ->join('commandes', 'cotations.id', '=', 'commandes.cotations_id')
+        $details = DB::table('commandes')
+            //->join('commandes', 'cotations.id', '=', 'commandes.cotations_id')
             ->join('line_de_commandes', 'commandes.id', '=', 'line_de_commandes.commandes_id')
             ->join('articles', 'articles.id', '=', 'line_de_commandes.articles_id')
             ->where('line_de_commandes.commandes_id', '=', $id)
-            ->select('articles.libelleArticle', 'commandes.codeCommande','cotations.codeCotation', 'line_de_commandes.*')
+            ->select('articles.libelleArticle', 'commandes.codeCommande', 'line_de_commandes.*')
             ->get();
 
-        $codeCommande = "";
-        foreach ($details as $detail){
-            $codeCommande = $detail->codeCommande;
-        }
+        $commande = Commande::findOrFail($id);
 
-        return view('commandes.details', compact('demandes', 'details', 'codeCommande'));
+
+        return view('commandes.details', compact('demandes', 'details', 'commande'));
     }
 
     /**
@@ -129,10 +194,10 @@ class CommandeController extends Controller
         $montant=0;
         $modePayement = "";
         foreach ($commandes as $commande){
-            $codeCommande=$commande->codeCommande;
-            $dateCommande=$commande->dateCommande;
+            $codeCommande = $commande->codeCommande;
+            $dateCommande = $commande->dateCommande;
             $modePayement = $commande->modePayement;
-            $fournisseur=$commande->nomSociete;
+            $fournisseur = $commande->nomSociete;
             $montant+=($commande->quantite*$commande->dernierPrix);
         }
 
@@ -184,12 +249,18 @@ class CommandeController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $slug)
+    public function update(Request $request, $id)
     {
         if($request->input('conditionPayement')){
-            $commande = Commande::whereSlug($slug)->first();
+            $commande = Commande::findOrFail($id);
             $commande->modePayement = $request->input('conditionPayement');
             $commande->save();
+
+            Flashy::success('conditions de payement ajoutées avec succès');
+
+            if ($commande->cotations_id == null){
+                return redirect()->route('commandeSpecifique');
+            }
 
             return redirect()->route('commande.index');
         }

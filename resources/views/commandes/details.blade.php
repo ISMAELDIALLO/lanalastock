@@ -29,10 +29,14 @@
                 <div class="col-lg-10 col-md-offset-1">
                     <div class="panel panel-default">
                         <div class="col col-lg-offset-10">
-                            <a href="{{route('commande.index')}}" class="btn btn-info fa fa-arrow-left btn-xl"></a>
+                            @if($commande->cotations_id == null)
+                                <a href="{{route('commandeSpecifique')}}" class="btn btn-info fa fa-arrow-left btn-xl"></a>
+                            @else
+                                <a href="{{route('commande.index')}}" class="btn btn-info fa fa-arrow-left btn-xl"></a>
+                            @endif
                         </div>
                         <div class="panel-heading">
-                            Details de la commande : {{$codeCommande}}
+                            Details de la commande : {{$commande->codeCommande}}
                         </div>
                         <!-- /.panel-heading -->
                         <div class="panel-body">
@@ -62,6 +66,7 @@
 
                         </div>
                         <!-- /.panel-body -->
+                        <a href="{{route('acount.edit', $commande->id)}}" class="">Effectuer un payement</a>
                     </div>
                     <!-- /.panel -->
                 </div>

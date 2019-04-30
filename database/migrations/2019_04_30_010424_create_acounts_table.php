@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateCommandesTable extends Migration
+class CreateAcountsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,14 +13,13 @@ class CreateCommandesTable extends Migration
      */
     public function up()
     {
-        Schema::create('commandes', function (Blueprint $table) {
+        Schema::create('acounts', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('fournisseurs_id')->index()->foreign('fournisseurs_id')->references('id')->on('fournisseurs')->onDelete('cascade');
-            $table->integer('cotations_id')->nullable()->index()->foreign('cotations_id')->references('id')->on('cotations')->onDelete('cascade');
+            $table->string('referencePayement')->nullable();
+            $table->integer('commandes_id')->index()->foreign('commandes_id')->references('id')->on('commandes')->onDelete('cascade');
+            $table->string('datePayement');
+            $table->double('montantPaye');
             $table->integer('users_id')->index()->foreign('users_id')->references('id')->on('users')->onDelete('cascade');
-            $table->string('codeCommande');
-            $table->date('dateCommande');
-            $table->string('slug');
             $table->timestamps();
         });
     }
@@ -32,6 +31,6 @@ class CreateCommandesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('commandes');
+        Schema::dropIfExists('acounts');
     }
 }

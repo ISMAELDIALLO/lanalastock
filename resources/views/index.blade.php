@@ -106,7 +106,11 @@
                                 </li>
                                 <li>
                                     <a href="{{route('detailCotation.create')}}"><span class="fa fa-plus-circle">Cotations</span></a>
-                                </li><li>
+                                </li>
+                                <li>
+                                    <a href="{{route('acount.index')}}"><span class="fa fa-plus-circle">Liste des avanches</span></a>
+                                </li>
+                                <li>
                                     <a href="{{route('commande.index')}}"><span class="fa fa-plus-circle">Commandes</span></a>
                                 </li>
                                 <li>

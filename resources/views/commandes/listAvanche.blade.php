@@ -28,9 +28,6 @@
                 </div>
                 <div class="col-lg-12">
                     <div class="panel panel-default">
-                        <div class="col col-lg-offset-9">
-                            <a href="{{route('commandeSpecifique')}}" class="fa fa-plus-circle btn-xl">Commande Sans Cotation</a>
-                        </div>
                         <div class="panel-heading">
                             Liste des commandes
                         </div>
@@ -40,32 +37,24 @@
                                 <table width="100%" class="table table-striped table-bordered table-hover text-center" id="dataTables-example">
                                     <thead>
                                     <tr>
-                                        <th class="text-center">COTATION</th>
+                                        <th class="text-center">REF PAYEMENT</th>
                                         <th class="text-center">COMMANDE</th>
+                                        <th class="text-center">FOURNISSEUR</th>
                                         <th class="text-center">DATE COMMANDE</th>
-                                        <th class="text-center">SOCIETE</th>
-                                        <th class="text-center">LE CONTACT</th>
-                                        <th class="text-center" width="100">DETAILS</th>
-                                        <th class="text-center">MODE DE PAYEMENT</th>
+                                        <th class="text-center">MONTANT PAYER</th>
                                         <th class="text-center" width="100">IMPRIMER</th>
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    @foreach($commandes as $commande)
+                                    @foreach($acounts as $acount)
                                         <tr>
-                                            <td>{{$commande->codeCotation}}</td>
-                                            <td>{{$commande->codeCommande}}</td>
-                                            <td>{{$commande->dateCommande}}</td>
-                                            <td>{{$commande->nomSociete}}</td>
-                                            <td>{{$commande->nomDuContact}} {{$commande->prenomDuContact}}</td>
+                                            <td>{{$acount->referencePayement}}</td>
+                                            <td>{{$acount->codeCommande}}</td>
+                                            <td>{{$acount->nomSociete}} {{$acount->nomDuContact}} {{$acount->prenomDuContact}}</td>
+                                            <td>{{$acount->dateCommande}}</td>
+                                            <td>{{$acount->montantPaye}}</td>
                                             <td>
-                                                <a href="{{route('commande.show', $commande->id)}}" class="btn btn-info fa fa-list"></a>
-                                            </td>
-                                            <td>
-                                                <a href="{{route('conditionPayement', $commande->id)}}" class="btn btn-info fa fa-credit-card"></a>
-                                            </td>
-                                            <td>
-                                                <a href="{{route('commande.edit',$commande->id)}}" class="btn btn-info fa fa-print btn-xl"></a>
+                                                <a href="{{route('acount.show',$acount->id)}}" class="btn btn-info fa fa-print btn-xl"></a>
                                             </td>
                                         </tr>
                                     @endforeach
@@ -73,13 +62,6 @@
 
                                 </table>
                             </section>
-                            <br>
-                            <!-- /.table-responsive -->
-                            @if($comm == 0)
-                            <a href="{{route('commande.index')}}">Toutes les commandes</a>
-                                @else
-                                <a href="{{route('derniereCotation')}}">Commandes Recentes</a>
-                            @endif
                         </div>
                         <!-- /.panel-body -->
                     </div>

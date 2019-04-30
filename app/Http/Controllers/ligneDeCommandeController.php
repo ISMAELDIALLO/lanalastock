@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use \DateTime;
 use Illuminate\Support\Facades\Session;
+use MercurySeries\Flashy\Flashy;
 
 class ligneDeCommandeController extends Controller
 {
@@ -102,14 +103,15 @@ class ligneDeCommandeController extends Controller
             ->select('articles.libelleArticle','articles.dernierPrix','cotations.codeCotation','detail_cotations.*')
             ->where('detail_cotations.cotations_id',session('idCotation'))
             ->get();
+        foreach ($lignes as $ligne){
+            if (!$request->input('prixUnitaire'.$ligne->id)){
+                Flashy::error('Le Prix unitaire est requis');
+                return back();
+            }
+        }
        foreach ($lignes as $ligne){
            $temp = new tableTemporaire();
            if ($request->input('prixUnitaire'.$ligne->id)){
-//               $testCommande = Commande::where([
-//                   'cotations_id' => session('idCotation'),
-//                   'fournisseurs_id' => $request->input('fournisseur'.$ligne->id)
-//               ])->get();
-
                $testCommande = DB::table('commandes')
                    ->where([
                        ['cotations_id', session('idCotation')],
@@ -165,7 +167,7 @@ class ligneDeCommandeController extends Controller
                }
            }
        }
-        return redirect()->route('commande.index');
+        return redirect()->route('derniereCotation');
     }
 
     /**

@@ -6,6 +6,7 @@ use App\Article;
 use App\TemporaireCotation;
 use App\TemporaireDemande;
 use Illuminate\Http\Request;
+use MercurySeries\Flashy\Flashy;
 
 class TemporaireCotationController extends Controller
 {
@@ -44,11 +45,15 @@ class TemporaireCotationController extends Controller
      */
     public function store(Request $request)
     {
-        $lignes = new TemporaireCotation();
-        $lignes->articles = $request->input('article');
-        $lignes->quantite = $request->input('quantite');
-        $lignes->save();
-        return redirect()->route('detailCotation.create',compact('lignes'));
+        if ($request->input('quantite')){
+            $lignes = new TemporaireCotation();
+            $lignes->articles = $request->input('article');
+            $lignes->quantite = $request->input('quantite');
+            $lignes->save();
+            return redirect()->route('detailCotation.create',compact('lignes'));
+        }
+        Flashy::error('La quantite est recquise');
+        return back();
     }
 
     /**

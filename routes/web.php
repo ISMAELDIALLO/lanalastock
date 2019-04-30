@@ -54,15 +54,26 @@ Route::resource('superCategorie','SuperCategorieArticleController');
 Route::resource('cotation','CotationController');
 Route::resource('detailCotation','DetailCotationController');
 Route::resource('temporaireCotation','TemporaireCotationController');
+Route::resource('acount','AcountController');
 
 //La route qui ramene la vue aApprovisionner
 Route::get('/aApprovisionner', 'stockController@aApprovisionner')->name('aApprovisionner');
+
+Route::get('/listeDerniereCotation', 'CommandeController@listeDerniereCotation')->name('derniereCotation');
+
+
+Route::get('/commande_specifique', 'CommandeController@listCommandeSpecifique')->name('commandeSpecifique');
+
+
 Route::get('/regetterProformat/{id}', 'TraiteFactureProformat@rejettrerProformat')->name('rejettrerProformat');
+
 Route::get('/cration_de_la_commande/{id}', 'ligneDeCommandeController@createCommande')->name('bonDeCommande');
+
 Route::get('/condition_de_payement_de_la_commande/{id}', 'CommandeController@conditionPayement')->name('conditionPayement');
 
 //Routes pour l'importation d'une liste en excel
 Route::get('export', 'articleController@exportFile')->name('export');
+
 Route::get('downloadExcel', 'articleController@downloadExcel')->name('downloadExcel');
 
 Auth::routes();
