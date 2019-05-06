@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Article;
 use App\TemporaireDemande;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use MercurySeries\Flashy\Flashy;
 
 class TemporaireDemandeController extends Controller
 {
@@ -31,8 +33,12 @@ class TemporaireDemandeController extends Controller
 
         $demandes = nonConsult();
 
-        $articles=Article::all();
-        return view('detailDemandes.createLigneDemande',compact('articles', 'demandes'));
+
+        $articles = DB::table('articles')
+            ->join('stocks', 'articles.id', '=', 'stocks.articles_id')
+            ->select('articles.*')
+            ->get();
+        return view('detailDemandes.create',compact('articles', 'demandes'));
     }
 
     /**
@@ -43,12 +49,16 @@ class TemporaireDemandeController extends Controller
      */
     public function store(Request $request)
     {
+        if (!$request->input('quantite')){
+            Flashy::error('La quantite est requise');
+            return back();
+        }
         $lignes=new TemporaireDemande();
         $lignes->articles=$request->input('article');
         $lignes->quantiteDemandee=$request->input('quantite');
         $lignes->users = auth()->user()->id;
         $lignes->save();
-        return redirect()->route('detailDemande.create',compact('lignes'));
+        return redirect()->route('detailDemande.create');
     }
 
     /**

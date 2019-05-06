@@ -89,26 +89,29 @@ class DemandeController extends Controller
             ->join('demandes', 'users.id', '=', 'demandes.users_id')
             ->join('detail_demandes', 'demandes.id', '=', 'detail_demandes.demandes_id')
             ->join('articles', 'articles.id', '=', 'detail_demandes.articles_id')
+            //->join('stocks','stocks.articles_id','=','articles.id')
             ->where('demandes.id', $id)
             ->select(
-                'users.nom', 'users.prenom', 'users.email', 'users.emailSuperieur',
-                'articles.libelleArticle', 'articles.id AS idArticle', 'detail_demandes.quantiteDemandee', 'detail_demandes.id AS detailDemandeId', 'demandes.*'
+                'users.nom', 'users.prenom', 'users.email', 'users.emailSuperieur','users.nomSuperieur',
+                'articles.libelleArticle', 'articles.id AS idArticle', 'detail_demandes.quantiteDemandee','detail_demandes.articles_id',
+                'detail_demandes.id AS detailDemandeId','demandes.*'
             )
             ->get();
+
+        $stocks = Stock::all();
         $codeDemande = "";
         $nom = "";
         $prenom = "";
         $email = "";
-        $emailSuperieur = "";
+        $nomSuperieur = "";
         foreach($details as $det){
             $codeDemande = $det->codeDemande;
             $nom = $det->nom;
             $prenom = $det->prenom;
-            $email = $det->email;
-            $emailSuperieur = $det->emailSuperieur;
+            $nomSuperieur = $det->nomSuperieur;
         }
 
-        return view('demandes.detail', compact('societes','details', 'demandes', 'codeDemande', 'nom', 'prenom', 'email', 'emailSuperieur'));
+        return view('demandes.detail', compact('societes','details', 'demandes', 'codeDemande', 'nom', 'prenom', 'email', 'nomSuperieur', 'stocks'));
     }
 
     /**

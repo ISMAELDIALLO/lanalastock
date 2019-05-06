@@ -20,6 +20,7 @@ class CreateCommandesTable extends Migration
             $table->integer('users_id')->index()->foreign('users_id')->references('id')->on('users')->onDelete('cascade');
             $table->string('codeCommande');
             $table->date('dateCommande');
+            $table->integer('etat')->nullable();
             $table->string('slug');
             $table->timestamps();
         });

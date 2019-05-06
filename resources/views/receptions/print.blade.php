@@ -57,7 +57,6 @@
                             <th>ARTICLE</th>
                             <th>QUANTITE</th>
                             <th>PRIX UNITAIRE</th>
-                            <th>MONTANT</th>
                         </tr>
                         </thead>
                         <tbody class="text-center col-md-offset-1">
@@ -67,8 +66,7 @@
                                 <td><?php $i++; echo $i;?></td>
                                 <td>{{$reception->libelleArticle}}</td>
                                 <td>{{$reception->quantite}}</td>
-                                <td>{{$reception->prixUnitaire}}</td>
-                                <td>{{$reception->quantite*$reception->prixUnitaire}}</td>
+                                <td>{{strrev(wordwrap(strrev($reception->prixUnitaire), 3,' ',true))}}</td>
                             </tr>
                         @endforeach
                         </tbody>
@@ -78,7 +76,7 @@
                     <div class="row col-lg-12 col-md-12 col-md-offset-2">
                         <div class="col-md-offset-1 col-md-3">
                             <span>MONTANT TOTAL : </span>
-                            <span>{{$montant}}</span>
+                            <span>{{strrev(wordwrap(strrev($montant), 3,' ',true))}}</span>
                         </div>
                     </div>
                 </div>

@@ -29,6 +29,7 @@ class articleController extends Controller
         $articles=DB::table('super_categorie_articles')
             ->join('famille_articles', 'super_categorie_articles.id', '=', 'famille_articles.super_categories_id')
             ->join('articles','famille_articles.id','=','articles.famille_articles_id')
+            ->where('articles.type', '=', 1)
             ->select('famille_articles.libelleFamilleArticle','articles.*')
             ->get();
         return view('articles.list',compact('articles', 'demandes'));
@@ -89,33 +90,9 @@ class articleController extends Controller
         $articles->quantiteminimum=$request->input('quantiteminimum');
         $articles->quantitemaximum=$request->input('quantitemaximum');
         $articles->dernierPrix=$request->input('dernierPrix');
-        if ($request->input('periodicitePayement')){
-            $articles->periodicitePayement=$request->input('periodicitePayement');
-        }
-        if ($request->input('dateDebutContrat')){
-            $articles->dateDebutContrat=$request->input('dateDebutContrat');
-        }
-        if ($request->input('dateFinContrat')){
-            $articles->dateFinContrat=$request->input('dateFinContrat');
-        }
+        $articles->type = 1;
         $articles->slug=$request->input('libelle').$date->format('YmdHis');
         $articles->save();
-
-        //on insere dans la table historique
-        $historique = new HistoriqueArticle();
-        if ($request->input('libelle')){
-            $historique->article=$request->input('libelle');
-        }
-        if ($request->input('dateDebutContrat')){
-            $historique->dateDebutContrat=$request->input('dateDebutContrat');
-        }
-        if ($request->input('dateFinContrat')){
-            $historique->dateFinContrat=$request->input('dateFinContrat');
-        }
-        if ($request->input('dernierPrix')){
-            $historique->prixUnitaire=$request->input('dernierPrix');
-        }
-        $historique->save();
 
         Flashy::success('Article ajouter avec succes');
         return redirect()->route('article.index');

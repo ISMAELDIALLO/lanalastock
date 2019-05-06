@@ -8,10 +8,13 @@ use App\Cotation;
 use App\Fournisseur;
 use App\Http\Requests\commandeFormResquest;
 use App\LineDeCommande;
+use App\Mail\mailDaf;
+use App\Parametre;
 use App\tableTemporaire;
 use \DateTime;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use MercurySeries\Flashy\Flashy;
 use PDF;
 
@@ -33,11 +36,13 @@ class CommandeController extends Controller
         $commandes=DB::table('fournisseurs')
             ->join('commandes','fournisseurs.id','=','commandes.fournisseurs_id')
             ->join('cotations', 'cotations.id', '=', 'commandes.cotations_id')
+            ->where('commandes.etat', 1)
             ->select('fournisseurs.nomSociete','fournisseurs.nomDuContact','fournisseurs.prenomDuContact','fournisseurs.telephoneDuContact',
                 'cotations.codeCotation','commandes.*')
             ->get();
         $comm = 1;
-        return view('commandes.liste',compact('commandes', 'demandes','comm'));
+        $validation = 0;
+        return view('commandes.liste',compact('commandes', 'demandes','comm','validation'));
     }
 
     public function listeDerniereCotation(){
@@ -52,11 +57,30 @@ class CommandeController extends Controller
             ->join('cotations', 'cotations.id', '=', 'commandes.cotations_id')
             ->select('fournisseurs.nomSociete','fournisseurs.nomDuContact','fournisseurs.prenomDuContact','fournisseurs.telephoneDuContact',
                 'cotations.codeCotation','commandes.*')
-            ->where('commandes.cotations_id','=',Cotation::max('id'))
+            ->where([
+                ['commandes.cotations_id','=',Cotation::max('id')],
+                ['commandes.etat','=',1]
+            ])
             ->get();
 
         $comm = 0;
         return view('commandes.liste',compact('commandes', 'demandes','comm'));
+    }
+
+    public function commandeEnAttenteDeValidation()
+    {
+        //nonConsult() est une methode helper qui retourne l'ensemble des comandes non consultees
+        //$demandes est utilisee a la page d'accueil apres l'authentification
+        //donc necessaires pour toutes les fonction qui utilse cette page
+
+        $demandes = nonConsult();
+
+        $commandes=DB::table('fournisseurs')
+            ->join('commandes','fournisseurs.id','=','commandes.fournisseurs_id')
+            ->select('fournisseurs.nomSociete','fournisseurs.nomDuContact','fournisseurs.prenomDuContact','fournisseurs.telephoneDuContact', 'commandes.*')
+            ->where('commandes.etat',0)
+            ->get();
+        return view('commandes.cmdEnAttenteDeValidation',compact('commandes', 'demandes'));
     }
 
     public function listCommandeSpecifique(){
@@ -68,7 +92,10 @@ class CommandeController extends Controller
 
         $commandes=DB::table('fournisseurs')
             ->join('commandes','fournisseurs.id','=','commandes.fournisseurs_id')
-            ->where('commandes.cotations_id', '=', null)
+            ->where([
+                ['commandes.cotations_id', '=', null],
+                ['commandes.etat', '=', 1]
+            ])
             ->select('fournisseurs.nomSociete','fournisseurs.nomDuContact','fournisseurs.prenomDuContact',
                 'fournisseurs.telephoneDuContact', 'commandes.*')
             ->get();
@@ -123,9 +150,17 @@ class CommandeController extends Controller
         $commandes->fournisseurs_id=$request->input('fournisseur');
         $commandes->codeCommande=$cm;
         $commandes->users_id = auth()->user()->id;
+        $commandes->etat = 0;
         $commandes->dateCommande = $date->format('Y-m-d');
         $commandes->slug=$request->input('dateCommande').$date->format('YmdHis');
         $commandes->save();
+
+        //Envoi de mail au DAF
+        $mailAudiraire = Parametre::findOrFail(1);
+        $mailAudiraire = $mailAudiraire->mailAuditaire;
+        $subject = "Validation d'une nouvelle commande";
+        $messageAuditeur = "Vous avez une commande en attente de validation. Numero de la Commande : " . $cm;
+        Mail::to($mailAudiraire)->send(new mailDaf($messageAuditeur, $subject));
 
         $idCommande = Commande::max('id');
 
@@ -159,6 +194,8 @@ class CommandeController extends Controller
 
         $demandes = nonConsult();
 
+        $validation = 1;
+
         $details = DB::table('commandes')
             //->join('commandes', 'cotations.id', '=', 'commandes.cotations_id')
             ->join('line_de_commandes', 'commandes.id', '=', 'line_de_commandes.commandes_id')
@@ -166,11 +203,9 @@ class CommandeController extends Controller
             ->where('line_de_commandes.commandes_id', '=', $id)
             ->select('articles.libelleArticle', 'commandes.codeCommande', 'line_de_commandes.*')
             ->get();
-
         $commande = Commande::findOrFail($id);
 
-
-        return view('commandes.details', compact('demandes', 'details', 'commande'));
+        return view('commandes.details', compact('demandes', 'details','validation','commande'));
     }
 
     /**

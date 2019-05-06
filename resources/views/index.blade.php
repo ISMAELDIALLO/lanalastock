@@ -81,6 +81,9 @@
                                     <a href="{{route('article.index')}}"><span class="fa fa-plus-circle">Articles</span></a>
                                 </li>
                                 <li>
+                                    <a href="{{route('contrat.create')}}"><span class="fa fa-plus-circle">Contrats</span></a>
+                                </li>
+                                <li>
                                     <a href="{{route('fournisseur.index')}}"><span class="fa fa-plus-circle">Fournisseurs</span></a>
                                 </li>
                             </ul>
@@ -114,7 +117,10 @@
                                     <a href="{{route('commande.index')}}"><span class="fa fa-plus-circle">Commandes</span></a>
                                 </li>
                                 <li>
-                                    <a href="{{route('reception.index')}}"><span class="fa fa-plus-circle">Receptions</span></a>
+                                    <a href="{{route('commandeEnAttenteDeValidation')}}"><span class="fa fa-plus-circle">Commandes à Valider</span></a>
+                                </li>
+                                <li>
+                                    <a href="{{route('reception.index')}}"><span class="fa fa-plus-circle">Liste des livraisons</span></a>
                                 </li>
 
                                 <li>
@@ -224,7 +230,7 @@
                 <!-- /.dropdown -->
                 <!-- /.dropdown -->
                 @if(auth()->user())
-                @if(auth()->user()->role=="gestionnaire")
+                @if(auth()->user()->role=="gestionnaire" || auth()->user()->role=="administrateur")
                     <li class="dropdown">
                         <a class="dropdown-toggle" data-toggle="dropdown" style="background-color: #ffffff" href="#">
                             @if($valeur > 0)

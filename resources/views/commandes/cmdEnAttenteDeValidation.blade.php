@@ -1,17 +1,11 @@
 @extends('index')
 @section('content')
-    <div id="wrapper" xmlns="http://www.w3.org/1999/html">
+    <div id="wrapper">
 
         <!-- Navigation -->
 
 
         <div id="page-wrapper">
-            <div class="row">
-                <div class="col-lg-12">
-                    <h1 class="page-header">Tableau</h1>
-                </div>
-                <!-- /.col-lg-12 -->
-            </div>
             <!-- /.row -->
 
             <!-- /.row -->
@@ -32,15 +26,10 @@
                     @endif
 
                 </div>
-                <div class="col-lg-8 col-md-8 col-md-offset-2">
+                <div class="col-lg-12">
                     <div class="panel panel-default">
-                        <div>
-                            <a href="{{route('compte.index')}}" class="col-md-offset-11 glyphicon glyphicon-arrow-left btn btn-info"></a>
-                        </div>
                         <div class="panel-heading">
-                            Details du compte :
-                            </br><b>COMPTE :      </b>{{$comptes}}
-                            </br>
+                            Liste des commandes
                         </div>
                         <!-- /.panel-heading -->
                         <div class="panel-body">
@@ -48,20 +37,34 @@
                                 <table width="100%" class="table table-striped table-bordered table-hover text-center" id="dataTables-example">
                                     <thead>
                                     <tr>
-                                        <th class="text-center">DATE</th>
-                                        <th class="text-center">MONTANT</th>
+                                        <th class="text-center">COMMANDE</th>
+                                        <th class="text-center">DATE COMMANDE</th>
+                                        <th class="text-center">SOCIETE</th>
+                                        <th class="text-center">LE CONTACT</th>
+                                        <th class="text-center" width="100">DETAILS</th>
+                                        <th class="text-center" width="100">VALIDER</th>
                                     </tr>
                                     </thead>
                                     <tbody>
-                                            @foreach($details as $detail)
-                                                <tr>
-                                                    <td>{{$detail->date}}</td>
-                                                    <td>{{strrev(wordwrap(strrev($detail->montant), 3,' ',true))}}</td>
-                                                </tr>
-                                            @endforeach
+                                    @foreach($commandes as $commande)
+                                        <tr>
+                                            <td>{{$commande->codeCommande}}</td>
+                                            <td>{{$commande->dateCommande}}</td>
+                                            <td>{{$commande->nomSociete}}</td>
+                                            <td>{{$commande->nomDuContact}} {{$commande->prenomDuContact}}</td>
+                                            <td>
+                                                <a href="{{route('commande.show', $commande->id)}}" class="btn btn-info fa fa-list"></a>
+                                            </td>
+                                            <td>
+                                                <a href="{{route('ligneDeCommande.show',$commande->id)}}" class="btn btn-info glyphicon glyphicon-ok btn-xl"></a>
+                                            </td>
+                                        </tr>
+                                    @endforeach
                                     </tbody>
+
                                 </table>
                             </section>
+                            <br>
                             <!-- /.table-responsive -->
                         </div>
                         <!-- /.panel-body -->

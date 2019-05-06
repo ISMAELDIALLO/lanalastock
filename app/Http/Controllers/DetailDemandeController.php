@@ -47,6 +47,11 @@ class DetailDemandeController extends Controller
 
         $demandes = nonConsult();
 
+        $articles = DB::table('articles')
+            ->join('stocks', 'articles.id', '=', 'stocks.articles_id')
+            ->select('articles.*')
+            ->get();
+
         $date=new DateTime();
         $dateDemande = $date->format('Y-m-d');
         $lignes=DB::table('articles')
@@ -54,7 +59,7 @@ class DetailDemandeController extends Controller
             ->select('articles.libelleArticle','temporaire_demandes.*')
             ->where('users',auth()->user()->id)
             ->get();
-        return view('detailDemandes.create',compact('lignes','dateDemande', 'demandes'));
+        return view('detailDemandes.create',compact('lignes','dateDemande', 'demandes','articles'));
     }
 
     /**
@@ -65,6 +70,12 @@ class DetailDemandeController extends Controller
      */
     public function store(Request $request)
     {
+        $temporaireDemandes=TemporaireDemande::where('users',auth()->user()->id)->get();
+        if ($temporaireDemandes->count() == 0){
+            Flashy::error('Veuillez remplir le tableau');
+            return back();
+        }
+        $date = new DateTime();
         //Enregistrement de la demande
         $dems=Demande::select(DB::raw("CONCAT('DM0', MAX(CAST(RIGHT(codeDemande,LENGTH(codeDemande)-3) AS UNSIGNED))+1) AS code"))
             ->get();
@@ -76,7 +87,7 @@ class DetailDemandeController extends Controller
         }
         $demandes=new Demande();
         $demandes->codeDemande=$dm;
-        $demandes->dateDemande=$request->input('dateDemande');
+        $demandes->dateDemande = $date->format('Y-m-d');
         $demandes->statut = 0;
         $demandes->users_id=auth()->user()->id;
         $demandes->save();
@@ -86,13 +97,12 @@ class DetailDemandeController extends Controller
         /*Insertion dans detail demande, tanque ya d'enregistrement dans la table temporaire Demande on insert dans la table
          detail Demande et à chque fois on un nouvel objet et apres insertion on supprime les données dans la table temporaire
         */
-        $temporaireDemandes=TemporaireDemande::where('users',auth()->user()->id)->get();
         //dd($temporaireDemandes);
         foreach ($temporaireDemandes as $temporaireDemande){
             $detaliDemande=new DetailDemande();
-            $detaliDemande->demandes_id=$idDemande;
-            $detaliDemande->articles_id=$temporaireDemande->articles;
-            $detaliDemande->quantiteDemandee=$temporaireDemande->quantiteDemandee;
+            $detaliDemande->demandes_id = $idDemande;
+            $detaliDemande->articles_id = $temporaireDemande->articles;
+            $detaliDemande->quantiteDemandee = $temporaireDemande->quantiteDemandee;
             $detaliDemande->save();
         }
 

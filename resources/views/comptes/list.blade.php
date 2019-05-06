@@ -74,7 +74,7 @@
                                     @foreach($comptes as $compte)
                                         <tr>
                                             <td>{{$compte->compte}}</td>
-                                            <td>{{$compte->montant}}</td>
+                                            <td>{{strrev(wordwrap(strrev($compte->montant), 3,' ',true))}}</td>
                                             <td class="text-center">
                                                 <a href="{{route('detailCompte.show',$compte->id)}}" class="btn btn-info fa fa-list btn-xl"></a>
                                             </td>

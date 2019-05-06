@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Acount;
 use App\Article;
+use App\Commande;
 use App\DetailReception;
 use App\Fournisseur;
+use App\LineDeCommande;
 use App\Reception;
 use App\Stock;
 use App\TemporaireReception;
@@ -12,6 +15,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use DateTime;
 use Illuminate\Support\Facades\Session;
+use MercurySeries\Flashy\Flashy;
 
 class DetailReceptionController extends Controller
 {
@@ -60,6 +64,49 @@ class DetailReceptionController extends Controller
         return view('detailReceptions.create',compact('fournisseurs','lignes', 'demandes'));
     }
 
+    public  function  creationBonApayer1(){
+        //nonConsult() est une methode helper qui retourne l'ensemble des comandes non consultees
+        //$demandes est utilisee a la page d'accueil apres l'authentification
+        //donc necessaires pour toutes les fonction qui utilse cette page
+
+        $demandes = nonConsult();
+
+        $lignes = null;
+        return view('detailReceptions.create',compact('demandes','lignes'));
+    }
+    public function creationBonApayer(Request $request){
+        //nonConsult() est une methode helper qui retourne l'ensemble des comandes non consultees
+        //$demandes est utilisee a la page d'accueil apres l'authentification
+        //donc necessaires pour toutes les fonction qui utilse cette page
+
+        $demandes = nonConsult();
+
+        if ($request->input('numeroCommande')){
+            $ligneCommandes = Commande::where('codeCommande',$request->input('numeroCommande'))->first();
+
+            $idCommande = $ligneCommandes->id;
+
+            Session::put('idCommande',$idCommande);
+        }
+
+        $lignes = DB::table('commandes')
+            ->join('line_de_commandes','line_de_commandes.commandes_id','=','commandes.id')
+            ->join('articles','articles.id','=','line_de_commandes.articles_id')
+            ->join('fournisseurs','fournisseurs.id','commandes.fournisseurs_id')
+            ->where('line_de_commandes.commandes_id', '=', session('idCommande'))
+            ->select('articles.referenceArticle','articles.libelleArticle','line_de_commandes.quantite',
+                        'line_de_commandes.prixUnitaire','fournisseurs.nomSociete','fournisseurs.nomDuContact',
+                        'fournisseurs.prenomDuContact','line_de_commandes.*','commandes.codeCommande')
+            ->get();
+        $fournisseur = "";
+        $codeCommande = "";
+        foreach ($lignes as $ligne){
+            $fournisseur = $ligne->nomSociete." ".$ligne->nomDuContact." ".$ligne->prenomDuContact;
+            $codeCommande = $ligne->codeCommande;
+        }
+        return view('detailReceptions.create',compact('fournisseur','codeCommande','demandes','lignes'));
+    }
+
     /**
      * Store a newly created resource in storage.
      *
@@ -68,7 +115,73 @@ class DetailReceptionController extends Controller
      */
     public function store(Request $request)
     {
-        $date=new DateTime();
+        $lignes = DB::table('commandes')
+            ->join('line_de_commandes','line_de_commandes.commandes_id','=','commandes.id')
+            ->join('articles','articles.id','=','line_de_commandes.articles_id')
+            ->join('fournisseurs','fournisseurs.id','commandes.fournisseurs_id')
+            ->where('line_de_commandes.commandes_id', '=', session('idCommande'))
+            ->select('articles.referenceArticle','articles.libelleArticle','line_de_commandes.quantite',
+                'line_de_commandes.prixUnitaire','fournisseurs.nomSociete','fournisseurs.nomDuContact',
+                'fournisseurs.prenomDuContact','line_de_commandes.*','commandes.codeCommande')
+            ->get();
+
+        $montantEncoursDeLivraison = 0;
+        foreach ($lignes as $ligne){
+            if (!$request->input('quantiteLivree'.$ligne->id)){
+                Flashy::error('La quantite livree est requise');
+                return redirect()->route('creationBonApayer');
+            }
+            $montantEncoursDeLivraison += $request->input('quantiteLivree'.$ligne->id)*$ligne->prixUnitaire;
+        }
+
+
+        foreach ($lignes as $ligne){
+            $quantiteDejaLivree = DB::table('commandes')
+                ->join('detail_receptions', 'commandes.id', '=', 'detail_receptions.commandes_id')
+                //->join('detail_receptions', 'receptions_id', '=', 'detail_receptions.receptions_id')
+                ->where([
+                    ['detail_receptions.commandes_id', '=', session('idCommande')],
+                    ['detail_receptions.articles_id', '=', $ligne->articles_id]
+                ])
+                ->sum('quantite');
+
+            //echo $quantiteDejaLivree.'<br>';
+            $quantiteLivree = $quantiteDejaLivree + $request->input('quantiteLivree'.$ligne->id);
+
+            if ($quantiteLivree > $ligne->quantite){
+                Flashy::error('Quantite trop grande, il reste : '.($ligne->quantite-$quantiteDejaLivree)." ".$ligne->libelleArticle." à livrer");
+                return redirect()->route('creationBonApayer');
+            }
+        }
+        //on recupere le montant deja paye en avance pour cette commande
+        $montantAvance = Acount::where('commandes_id', session('idCommande'))->sum('montantPaye');
+
+
+        //recuperation de la valeur du montant de ce qui est livre et le montant paye concernant cette commande
+        $recepts = DetailReception::where('commandes_id', session('idCommande'))->get();
+
+        $sumMontantApayer = Reception::where('commandes_id', session('idCommande'))->sum('montantApayer');
+
+        $montantRecu = 0;
+
+        foreach ($recepts as $recept){
+            $montantRecu += $recept->quantite*$recept->prixUnitaire;
+        }
+
+        $montantRecu += $montantEncoursDeLivraison;
+
+        //Le montant paye en avance plus le montant paye lors des precedentes livraisons concernant cette commande
+        $montantDejaPayer = $montantAvance + $sumMontantApayer;
+
+        //On calcule le montant a payer pour cette livraison pour qu'on l'insere dans la table receptions
+        $montantApayer = $montantRecu - $montantDejaPayer;
+
+        if ($montantApayer < 0){
+            Flashy::error('Cette livraison ne couvre pas le montant payé en avance');
+            return redirect()->route('creationBonApayer');
+        }
+
+        $date = new DateTime();
         //Enregistrement de la commande
         $recs=Reception::select(DB::raw("CONCAT('RC0', MAX(CAST(RIGHT(codeReception,LENGTH(codeReception)-3) AS UNSIGNED))+1) AS code"))
             ->get();
@@ -79,64 +192,64 @@ class DetailReceptionController extends Controller
             }
         }
         $receptions=new Reception();
-        $receptions->fournisseurs_id=$request->input('fournisseur');
-        $receptions->codeReception=$rc;
-        $receptions->dateReception=$request->input('dateReception');
+        $receptions->codeReception = $rc;
+        $receptions->dateReception = $date->format('Y-m-d');
+        $receptions->users_id = auth()->user()->id;
+        $receptions->commandes_id = session('idCommande');
+        $receptions->montantApayer = $montantApayer;
         $receptions->slug=$request->input('dateReception').$date->format('YmdHis');
         $receptions->save();
 
         //Selection de l'identifiant de la reception
-        $idReception=Reception::max('id');
-        /*Insertion dans ligne de reception, tanque ya d'enregistrement dans la table temporaire on insert dans la table
-         ligne de reception et à chque fois on un nouvel objet et apres insertion on supprime les données dans la table temporaire
-        */
-        $temporaires=TemporaireReception::all();
-        foreach ($temporaires as $temporaire){
+        $idReception = Reception::max('id');
+
+        foreach ($lignes as $ligne){
+
             $detailReception = new DetailReception();
             $detailReception->receptions_id=$idReception;
-            $detailReception->articles_id=$temporaire->articles;
-            $detailReception->quantite=$temporaire->quantite;
-            $detailReception->prixUnitaire=$temporaire->prixUnitaire;
-            $detailReception->slug=$rc.$date->format('YmdHis');
+            $detailReception->commandes_id = session('idCommande');
+            $detailReception->articles_id = $ligne->articles_id;
+            $detailReception->quantite = $request->input('quantiteLivree'.$ligne->id);
+            $detailReception->prixUnitaire = $ligne->prixUnitaire;
+            $detailReception->slug=$ligne->articles_id.$date->format('YmdHis');
             $detailReception->save();
 
             //Ajoute dans la table stock
 
             /*Si la l'article n'existe pas dans le stock on l'ajoute sinon on ajoute sa quantite */
-            if (get_article_unique_in_stock($temporaire->articles)==false){
+            if (get_article_unique_in_stock($ligne->articles_id)==false){
                 //creation dans le stock
-                $stocks=new Stock();
-                $stocks->articles_id = $temporaire->articles;
-                $stocks->quaniteStock = $temporaire->quantite;
-                $stocks->prixStock = $temporaire->prixUnitaire;
+                $stocks = new Stock();
+                $stocks->articles_id = $ligne->articles_id;
+                $stocks->quaniteStock = $request->input('quantiteLivree'.$ligne->id);
+                $stocks->prixStock = $ligne->prixUnitaire;
                 $stocks->save();
             }else{
                 //on selectionne la ligne qui correspond a l'article dans le stock
                 //pour pouvoir recuperer sa quantite et son prix afin de calculer le nouveau prix du stock
-                $stk = Stock::where('articles_id', $temporaire->articles)->first();
+                $stk = Stock::where('articles_id', $ligne->articles_id)->first();
                 //calcul de l'ancien prix de l'article en stock
                 $valeurStock = $stk->quaniteStock * $stk->prixStock;
 
                 //calcul du prix de l'article a ajouter
-                $nouvelleValeur = $temporaire->prixUnitaire * $temporaire->quantite;
+                $nouvelleValeur = $ligne->prixUnitaire * $request->input('quantiteLivree'.$ligne->id);
 
                 //Calcul du nouveau prix de l'article dans le stock apres l'ajout
-                $prixStock = ($valeurStock + $nouvelleValeur)/($stk->quaniteStock + $temporaire->quantite);
+                $prixStock = ($valeurStock + $nouvelleValeur)/($stk->quaniteStock + $request->input('quantiteLivree'.$ligne->id));
 
                 //modofocation dans le stock
                 $stocks=stock::findOrFail(session('stockAmodifier'));
-                $stocks->prixStock = round($prixStock, 2);
-                $stocks->quaniteStock+=$temporaire->quantite;
+                $stocks->prixStock = round($prixStock, 0);
+                $stocks->quaniteStock += $request->input('quantiteLivree'.$ligne->id);
                 $stocks->save();
             }
 
             //Modification du dernier prix de l'article
-            $articles = Article::findOrFail($temporaire->articles);
-            $articles->dernierPrix = $temporaire->prixUnitaire;
+            $articles = Article::findOrFail($ligne->articles_id);
+            $articles->dernierPrix = $ligne->prixUnitaire;
             $articles->save();
         }
-        //Vider la table temporaire
-        TemporaireReception::truncate();
+
         return redirect()->route('reception.index');
     }
 

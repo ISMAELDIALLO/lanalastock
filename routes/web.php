@@ -47,7 +47,7 @@ Route::resource('menu','MenuController');
 Route::resource('sousMenu','SousMenuController');
 Route::resource('abilitation','AbilitationController');
 Route::resource('detailProformat','DetailproformatController');
-Route::resource('temporaireProformat','TemporaireProformatController');
+//Route::resource('temporaireProformat','TemporaireProformatController');
 Route::resource('proformat','ProformatController');
 Route::resource('traiteFacture','TraiteFactureProformat');
 Route::resource('superCategorie','SuperCategorieArticleController');
@@ -55,6 +55,7 @@ Route::resource('cotation','CotationController');
 Route::resource('detailCotation','DetailCotationController');
 Route::resource('temporaireCotation','TemporaireCotationController');
 Route::resource('acount','AcountController');
+Route::resource('contrat','ContratController');
 
 //La route qui ramene la vue aApprovisionner
 Route::get('/aApprovisionner', 'stockController@aApprovisionner')->name('aApprovisionner');
@@ -63,6 +64,11 @@ Route::get('/listeDerniereCotation', 'CommandeController@listeDerniereCotation')
 
 
 Route::get('/commande_specifique', 'CommandeController@listCommandeSpecifique')->name('commandeSpecifique');
+
+Route::get('/creationBonApayer1', 'DetailReceptionController@creationBonApayer1')->name('creationBonApayer1');
+Route::post('/creationBonApayer', 'DetailReceptionController@creationBonApayer')->name('creationBonApayer');
+Route::get('/creationBonApayer', 'DetailReceptionController@creationBonApayer')->name('creationBonApayer');
+Route::get('/commandes_en_attente_de_validation', 'CommandeController@commandeEnAttenteDeValidation')->name('commandeEnAttenteDeValidation');
 
 
 Route::get('/regetterProformat/{id}', 'TraiteFactureProformat@rejettrerProformat')->name('rejettrerProformat');

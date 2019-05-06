@@ -32,69 +32,57 @@
                     @endif
 
                 </div>
-                <div class="col-lg-8 col-md-8 col-md-offset-2">
+                <div class="col-lg-10 col-md-10 col-md-offset-1">
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             Details de la demande :
                             </br><b>CODE :      </b>{{$codeDemande}}
                             </br><b>DEMANDEUR : </b>{{$nom}} {{$prenom}} {{$email}}
-                            </br><b>SUPERIEUR : </b>{{$emailSuperieur}}
+                            </br><b>SUPERIEUR : </b>{{$nomSuperieur}}
                         </div>
                         <!-- /.panel-heading -->
                         <div class="panel-body">
-                            <section class="table-responsive">
-                                <table width="100%" class="table table-striped table-bordered table-hover" id="dataTables-example">
-                                    <thead>
-                                    <tr>
-                                        <th>ARTICLE</th>
-                                        <th>QUANTITE DEMANDEE</th>
-                                        <th>QUANTITE AFFECTEE</th>
-                                        <th>Action</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    @foreach($details as $detail)
+                            <form action="{{route('detailSortieStock.update', $codeDemande)}}" method="POST">
+                                {{method_field('PUT')}}
+                                {{csrf_field()}}
+                                <section class="table-responsive">
+                                    <table width="100%" class="table table-striped table-bordered table-hover" id="dataTables-example">
+                                        <thead>
                                         <tr>
-                                            <td>{{$detail->libelleArticle}}</td>
-                                            <td>{{$detail->quantiteDemandee}}</td>
-                                            <td>
-                                                @if(session('quantiteAffectee'.$detail->detailDemandeId))
-                                                    {{session('quantiteAffectee'.$detail->detailDemandeId)}}
-                                                @else
-                                                    {{0}}
-                                                @endif
-                                            </td>
-                                            <td class="text-center">
-                                                @if($detail->statut != -1)
-                                                <a href="{{route('sortieStock.show', $detail->detailDemandeId)}}" class="btn btn-success fa fa-pencil-square-o btn-xl">Editer</a>
-                                                @endif
-                                            </td>
+                                            <th>ARTICLE</th>
+                                            <th>QTE EN STOCK</th>
+                                            <th>QTE DEMANDEE</th>
+                                            <th width="100">QTE AFFECTEE</th>
                                         </tr>
-                                    @endforeach
-                                    </tbody>
-                                </table>
-                            </section>
+                                        </thead>
+                                        <tbody>
+                                        @foreach($details as $detail)
+                                            <tr>
+                                                <td>{{$detail->libelleArticle}}</td>
+                                                <td>
+                                                    @foreach($stocks as $stk)
+                                                        @if($stk->articles_id == $detail->articles_id)
+                                                            {{$stk->quaniteStock}}
+                                                        @endif
+                                                    @endforeach
+                                                </td>
+                                                <td>{{$detail->quantiteDemandee}}</td>
+                                                <td>
+                                                    <input type="text" class="form-control text-center" name="{{'quantiteAffectee'}}{{$detail->detailDemandeId}}">
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                        </tbody>
+                                    </table>
+                                </section>
+                                <button class="btn btn-info col-md-offset-5 glyphicon glyphicon-ok" type="submit"></button>
+                            </form>
                             <!-- /.table-responsive -->
 
                         </div>
                         <!-- /.panel-body -->
                     </div>
                     <!-- /.panel -->
-                </div>
-                <div class="row col-md-8 col-md-offset-5">
-                    <form action="{{route('detailSortieStock.update', $codeDemande)}}" method="post">
-                        {{csrf_field()}}
-                        {{method_field('PUT')}}
-                        <div class="form-group-lg">
-                            <label for="">SOCIETES</label><br>
-                            @foreach($societes as $societe)
-                                <input type="checkbox" name="{{$societe->id}}" value="{{$societe->id}}" class="">{{$societe->nomSociete}}<br>
-                            @endforeach
-                        </div>
-                        <div class="">
-                            <button type="submit" class="btn btn-info btn-xl fa fa-check"></button>
-                        </div>
-                    </form>
                 </div>
                 <!-- /.col-lg-12 -->
             </div>

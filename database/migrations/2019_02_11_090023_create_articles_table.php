@@ -25,6 +25,7 @@ class CreateArticlesTable extends Migration
             $table->integer('quantiteInventaire')->nullable();
             $table->string('periodicitePayement')->nullable();
             $table->string('dateDebutContrat')->nullable();
+            $table->integer('type')->nullable();
             $table->string('dateFinContrat')->nullable();
             $table->string('slug');
             $table->timestamps();

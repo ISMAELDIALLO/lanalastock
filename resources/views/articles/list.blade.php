@@ -49,12 +49,8 @@
                                         <th>PU</th>
                                         <th>DATE INVENT.</th>
                                         <th>QTE INVENT.</th>
-                                        <th>PERIODICITE PAYEMENT</th>
-                                        <th>DEBUT CONTRAT</th>
-                                        <th>FIN CONTRAT</th>
                                         <th>MODIFIER</th>
                                         <th>SUPPRIMER</th>
-                                        <th>RENOUVELER</th>
                                     </tr>
                                     </thead>
                                     <tbody>
@@ -66,9 +62,6 @@
                                             <td>{{$article->dernierPrix}}</td>
                                             <td>{{$article->dateInventaire}}</td>
                                             <td>{{$article->quantiteInventaire}}</td>
-                                            <td>{{$article->periodicitePayement}}</td>
-                                            <td>{{$article->dateDebutContrat}}</td>
-                                            <td>{{$article->dateFinContrat}}</td>
                                             <td class="text-center">
                                                 <a href="{{route('article.edit',$article->slug)}}" class="btn btn-info fa fa-pencil-square-o btn-xl"></a>
                                             </td>
@@ -78,9 +71,6 @@
                                                     {{method_field('delete')}}
                                                     <button class="btn btn-danger fa fa-trash-o"></button>
                                                 </form>
-                                            </td>
-                                            <td class="text-center">
-                                                <a href="{{route('article.show',$article->slug)}}" class="btn btn-info glyphicon glyphicon-repeat btn-xl"></a>
                                             </td>
                                         </tr>
                                     @endforeach

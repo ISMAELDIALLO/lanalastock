@@ -54,7 +54,7 @@
                                             <td>{{$detail->libelleArticle}}</td>
                                             <td>{{$detail->quantiteSortante}}</td>
                                             <td>{{$detail->quantiteDemandee}}</td>
-                                            <td>{{$detail->prix}}</td>
+                                            <td>{{strrev(wordwrap(strrev($detail->prix), 3,' ',true))}}</td>
                                             <td>{{$detail->motif}}</td>
                                         </tr>
                                     @endforeach

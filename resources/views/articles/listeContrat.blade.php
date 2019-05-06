@@ -1,3 +1,4 @@
+
 @extends('index')
 @section('content')
     <div id="wrapper">
@@ -6,6 +7,9 @@
 
 
         <div id="page-wrapper">
+            <div class="row">
+                <!-- /.col-lg-12 -->
+            </div>
             <!-- /.row -->
 
             <!-- /.row -->
@@ -28,11 +32,11 @@
                 </div>
                 <div class="col-lg-12">
                     <div class="panel panel-default">
-                        <div class="col col-lg-offset-9 col-md-offset-9">
-                            <a href="{{route('creationBonApayer1')}}" class="btn btn-info fa fa-plus-circle btn-xl">NOUVELLE RECEPTION</a>
+                        <div class="col col-lg-offset-10">
+                            <a href="{{route('contrat.create')}}" class="btn btn-info fa fa-plus-circle btn-xl">NOUVEAU CONTRAT</a>
                         </div>
                         <div class="panel-heading">
-                            Liste des receptions
+                            Liste des contrats
                         </div>
                         <!-- /.panel-heading -->
                         <div class="panel-body">
@@ -40,33 +44,40 @@
                                 <table width="100%" class="table table-striped table-bordered table-hover text-center" id="dataTables-example">
                                     <thead>
                                     <tr>
-                                        <th class="text-center">RECEPTION</th>
-                                        <th class="text-center">DATE LIVRAISON</th>
-                                        <th class="text-center">N° COMMANDE</th>
-                                        <th class="text-center">SOCIETE</th>
-                                        <th class="text-center">LE CONTACT</th>
-                                        <th>DETAILS</th>
-                                        <th>IMPRIMER</th>
+                                        <th>CONTRAT</th>
+                                        <th>PERIODICITE PAYEMENT</th>
+                                        <th>DEBUT CONTRAT</th>
+                                        <th>FIN CONTRAT</th>
+                                        <th>PRIME</th>
+                                        <th>MODIFIER</th>
+                                        <th>SUPPRIMER</th>
+                                        <th>RENOUVELER</th>
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    @foreach($receptions as $reception)
+                                    @foreach($articles as $article)
                                         <tr>
-                                            <td>{{$reception->codeReception}}</td>
-                                            <td>{{$reception->dateReception}}</td>
-                                            <td>{{$reception->codeCommande}}</td>
-                                            <td>{{$reception->nomSociete}}</td>
-                                            <td>{{$reception->nomDuContact}} {{$reception->prenomDuContact}} {{$reception->telephoneDuContact}}</td>
-                                            <td>
-                                                <a href="{{route('reception.show',$reception->id)}}" class="btn btn-info fa fa-list btn-xl"></a>
+                                            <td>{{$article->libelleFamilleArticle}} {{$article->referenceArticle}} {{$article->libelleArticle}}</td>
+                                            <td>{{$article->periodicitePayement}}</td>
+                                            <td>{{$article->dateDebutContrat}}</td>
+                                            <td>{{$article->dateFinContrat}}</td>
+                                            <td>{{$article->dernierPrix}}</td>
+                                            <td class="text-center">
+                                                <a href="{{route('contrat.edit',$article->slug)}}" class="btn btn-info fa fa-pencil-square-o btn-xl"></a>
                                             </td>
                                             <td class="text-center">
-                                                <a href="{{route('reception.edit',$reception->id)}}" class="btn btn-info fa fa-print btn-xl"></a>
+                                                <form action="{{route('contrat.destroy',$article->slug)}}" method="post">
+                                                    {{csrf_field()}}
+                                                    {{method_field('delete')}}
+                                                    <button class="btn btn-danger fa fa-trash-o"></button>
+                                                </form>
+                                            </td>
+                                            <td class="text-center">
+                                                <a href="{{route('contrat.show',$article->slug)}}" class="btn btn-info glyphicon glyphicon-repeat btn-xl"></a>
                                             </td>
                                         </tr>
                                     @endforeach
                                     </tbody>
-
                                 </table>
                             </section>
                             <!-- /.table-responsive -->

@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Acount;
+use App\DetailReception;
 use App\Fournisseur;
 use App\Reception;
 use PDF;
@@ -24,8 +26,10 @@ class ReceptionController extends Controller
         $demandes = nonConsult();
 
         $receptions=DB::table('fournisseurs')
-            ->join('receptions','fournisseurs.id','=','receptions.fournisseurs_id')
-            ->select('fournisseurs.nomSociete','fournisseurs.nomDuContact','fournisseurs.prenomDuContact','fournisseurs.telephoneDuContact','receptions.*')
+            ->join('commandes','fournisseurs.id','=','commandes.fournisseurs_id')
+            ->join('receptions','commandes.id','=','receptions.commandes_id')
+            ->select('fournisseurs.nomSociete','fournisseurs.nomDuContact','fournisseurs.prenomDuContact',
+                'fournisseurs.telephoneDuContact','receptions.*', 'commandes.codeCommande')
             ->get();
         return view('receptions.liste',compact('receptions', 'demandes'));
     }
@@ -97,12 +101,14 @@ class ReceptionController extends Controller
     public function edit($slug)
     {
 
-        $receptions=DB::table('articles')
-            ->join('detail_receptions','detail_receptions.articles_id','=','articles.id')
-            ->join('receptions','receptions.id','=','detail_receptions.receptions_id')
-            ->join('fournisseurs','fournisseurs.id','=','receptions.fournisseurs_id')
-            ->select('detail_receptions.quantite','detail_receptions.prixUnitaire','articles.libelleArticle','fournisseurs.nomSociete','receptions.*')
-            ->where('receptions.slug','=',$slug)
+        $receptions=DB::table('commandes')
+            ->join('receptions','commandes.id','=','receptions.commandes_id')
+            ->join('detail_receptions','receptions.id','=','detail_receptions.receptions_id')
+            ->join('articles','detail_receptions.articles_id','=','articles.id')
+            ->join('fournisseurs','fournisseurs.id','=','commandes.fournisseurs_id')
+            ->select('detail_receptions.quantite','detail_receptions.prixUnitaire',
+                'articles.libelleArticle','fournisseurs.nomSociete','receptions.*')
+            ->where('receptions.id','=',$slug)
             ->get();
         $codeReception="";
         $dateReception="";
@@ -110,10 +116,12 @@ class ReceptionController extends Controller
         $montant=0;
         foreach ($receptions as $reception){
             $codeReception=$reception->codeReception;
-            $dateReception=$reception->dateReception;
+            $dateReception = $reception->dateReception;
             $fournisseur=$reception->nomSociete;
-            $montant+=($reception->quantite*$reception->prixUnitaire);
+            $montant = $reception->montantApayer;
         }
+
+
         $pdf = PDF::loadView('receptions.print', compact('receptions','codeReception','dateReception','fournisseur','montant'))->setPaper('a4', 'portrait');
         $fileName = $codeReception;
         return $pdf->stream($fileName . '.pdf');

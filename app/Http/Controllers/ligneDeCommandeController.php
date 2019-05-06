@@ -7,11 +7,15 @@ use App\Commande;
 use App\Fournisseur;
 use App\Http\Requests\commandeFormResquest;
 use App\LineDeCommande;
+use App\Mail\EnvoiMailDemandeur;
+use App\Mail\mailDaf;
+use App\Parametre;
 use App\Stock;
 use App\tableTemporaire;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use \DateTime;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Session;
 use MercurySeries\Flashy\Flashy;
 
@@ -151,9 +155,17 @@ class ligneDeCommandeController extends Controller
                    $commandes->cotations_id = session('idCotation');
                    $commandes->users_id = auth()->user()->id;
                    $commandes->codeCommande=$cm;
+                   $commandes->etat = 0;
                    $commandes->dateCommande=$date->format('Y-m-d');
                    $commandes->slug=$request->input('dateCommande').$date->format('YmdHis');
                    $commandes->save();
+
+                   //Envoi de mail au DAF
+                   $mailAudiraire = Parametre::findOrFail(1);
+                   $mailAudiraire = $mailAudiraire->mailAuditaire;
+                   $subject = "Validation d'une nouvelle commande";
+                   $messageAuditeur = "Vous avez une commande en attente de validation. Numero de la Commande : " . $cm;
+                   Mail::to($mailAudiraire)->send(new mailDaf($messageAuditeur, $subject));
 
                    //on insere dans ligne aussi
 
@@ -167,6 +179,7 @@ class ligneDeCommandeController extends Controller
                }
            }
        }
+
         return redirect()->route('derniereCotation');
     }
 
@@ -178,7 +191,20 @@ class ligneDeCommandeController extends Controller
      */
     public function show($id)
     {
+            $commandes = Commande::findOrFail($id);
+            $codeCommande = $commandes->codeCommande;
+            $commandes->etat = 1;
+            $commandes->save();
 
+            $mailGestionnaire = Parametre::findOrFail(1);
+            $mailGestionnaire = $mailGestionnaire->mailGestionnaire;
+            $subject = "Commande validee par le DAF";
+            $message = "Votre commande ".$codeCommande." à été validée";
+
+            Mail::to($mailGestionnaire)->send(new mailDaf($message, $subject));
+
+            Flashy::success('commande validée avec succès');
+            return back();
     }
 
     /**

@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use MercurySeries\Flashy\Flashy;
 use DateTime;
+use mysql_xdevapi\Session;
 
 class DetailSortieStockController extends Controller
 {
@@ -119,23 +120,8 @@ class DetailSortieStockController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $societes = Societe::all();
-
-        $nomS = "";
-         $nombre =0;
-        foreach ($societes as $societe){
-           if ($request->input($societe->id)){
-               $nomS = $request->input($societe->id);
-               $nombre++;
-           }
-        }
-        if (!$nomS){
-            Flashy::error('Veuillez selectionner au moins societe');
-            return back();
-        }
 
         //L'update ici concerne juste la sortie dans le stock ça n'a rien à voir avec la modification
-
 
         $date = new DateTime();
 
@@ -146,13 +132,10 @@ class DetailSortieStockController extends Controller
         //recuperation du mail de l'utilisateur qui a fait la demande
         $mailUser = User::findOrFail($idDemande->users_id)->email;
 
+        //Recuperation de l'identifiant de l'utilisateur dans la demande
+        $idUser = $idDemande->users_id;
 
         $idDemande = $idDemande->id;
-        //Modification du statut de la demande pour montrer que la demande a ete valide
-        $demande = Demande::findOrFail($idDemande);
-        $demande->statut = 1;
-        $demande->etat = 1;
-        $demande->save();
 
         $details = DB::table('demandes')
             ->join('detail_demandes', 'demandes.id', '=', 'detail_demandes.demandes_id')
@@ -163,6 +146,24 @@ class DetailSortieStockController extends Controller
                 'detail_demandes.articles_id'
             )
             ->get();
+        foreach ($details as $detail){
+            $articleInStock = Stock::where('articles_id',$detail->articles_id)->first();
+            $qteStock = $articleInStock->quaniteStock;
+            if ($qteStock < $request->input('quantiteAffectee'.$detail->detailDemandeId)){
+                Flashy::error('Quantite trop grande');
+                return back();
+            }
+            if (!$request->input('quantiteAffectee'.$detail->detailDemandeId)){
+                Flashy::error('Veuillez saisir la quantite à affecter');
+                return back();
+            }
+        }
+
+        //Modification du statut de la demande pour montrer que la demande a ete valide
+        $demande = Demande::findOrFail($idDemande);
+        $demande->statut = 1;
+        $demande->etat = 1;
+        $demande->save();
 
         //generation automatique du code de la sortie stock
         $sors=SortieStock::select(DB::raw("CONCAT('S00', MAX(CAST(RIGHT(codeSortie,LENGTH(codeSortie)-3) AS UNSIGNED))+1) AS code"))
@@ -191,60 +192,43 @@ class DetailSortieStockController extends Controller
             $sortieStock = new DetailSortieStock();
             $sortieStock->articles_id = $det->articles_id;
             $sortieStock->sortie_stocks_id = $idSortie;
-            $sortieStock->quantiteSortante = session('quantiteAffectee'.$det->detailDemandeId);
+            $sortieStock->quantiteSortante = $request->input('quantiteAffectee'.$det->detailDemandeId);
             $sortieStock->detailDemandes_id = $det->detailDemandeId;
             $sortieStock->quantiteDemandee = $det->quantiteDemandee;
-            $sortieStock->prix = session('quantiteAffectee'.$det->detailDemandeId)*$stock->prixStock;
+            $sortieStock->prix = $request->input('quantiteAffectee'.$det->detailDemandeId)*$stock->prixStock;
             $sortieStock->save();
 
             //modification du stock
             if(Stock::where('articles_id', $det->articles_id)->first()){
                 $stock = Stock::where('articles_id', $det->articles_id)->first();
-                $stock->quaniteStock -= session('quantiteAffectee'.$det->detailDemandeId);
+                $stock->quaniteStock -= $request->input('quantiteAffectee'.$det->detailDemandeId);
                 $stock->save();
             }
 
-            $test = DetailCompte::where('date', $dateDuJour)->first();
-            //insertion dans compte si toutes les societes ont été cochée
-            if ($nombre == $societe->count()){
-                //Si aumoins un enregistrement existe on fait une mise à jour de son montant
-                if (ComptePrincipal::all()->count()>0){
+            // Selection permettant de montrer la societe à la quelle appartient l'utilisateur
 
-                    $comptePrincipal = ComptePrincipal::findOrFail(1);
-                    $comptePrincipal->montant += session('quantiteAffectee'.$det->detailDemandeId)*$stock->prixStock;
-                    $comptePrincipal->save();
-                }else{
-                    //Sinon on on crée une nouvelle ligne
-                    $comptePrincipal = new ComptePrincipal();
-                    $comptePrincipal->montant = session('quantiteAffectee'.$det->detailDemandeId)*$stock->prixStock;
-                    $comptePrincipal->save();
-                }
-            }else{
-                foreach ($societes as $societe){
-                    if ($request->input($societe->id)){
+            $compte_users = DB::table('societes')
+                        ->join('comptes','comptes.societes_id','=','societes.id')
+                        ->join('services','services.societes_id','=','societes.id')
+                        ->join('users','users.services_id','=','services.id')
+                        ->where('users.id',$idUser)
+                        ->select('comptes.id as idCompte')
+                        ->get();
 
-                        //Recuperation de l'identifiant du compte pour l'inserer dans detail compte à travers l'identifiant
-                        //de la societe selectionnée. La boucle foreach nous permet d'aller chercher la
-                        // societe cocher dans la table compte
+            $idCompteUser = 0;
 
-                        $idCompte = Compte::where('societes_id',$request->input($societe->id))->first();
-                        $idCompte = $idCompte->id;
-
-                        //ajout dans detail compte
-                         $detail = new DetailCompte();
-                         $detail->comptes_id = $idCompte;
-                         $detail->montant = session('quantiteAffectee'.$det->detailDemandeId)*$stock->prixStock;
-                         $detail->date = $dateDuJour;
-                         $detail->save();
-
-                         // On alimente le compte par societe qui est la somme des montants du detailCompte
-                         $compte = Compte::findOrFail($idCompte);
-                         $compte->montant += session('quantiteAffectee'.$det->detailDemandeId)*$stock->prixStock;
-                         $compte->save();
-                    }
-                }
-
+            foreach ($compte_users as $compte_user){
+                $idCompteUser = $compte_user->idCompte;
             }
+
+             $detail = new DetailCompte();
+             $detail->comptes_id = $idCompteUser;
+             $detail->montant = $request->input('quantiteAffectee'.$det->detailDemandeId)*$stock->prixStock;
+             $detail->date = $dateDuJour;
+             $detail->save();
+             $compte = Compte::findOrFail($idCompteUser);
+             $compte->montant += $request->input('quantiteAffectee'.$det->detailDemandeId)*$stock->prixStock;
+             $compte->save();
 
         }
 

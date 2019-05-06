@@ -29,7 +29,9 @@
                 <div class="col-lg-10 col-md-offset-1">
                     <div class="panel panel-default">
                         <div class="col col-lg-offset-10">
-                            @if($commande->cotations_id == null)
+                            @if($commande->etat ==0)
+                                <a href="{{route('commandeEnAttenteDeValidation')}}" class="btn btn-info fa fa-arrow-left btn-xl"></a>
+                            @elseif($commande->cotations_id == null)
                                 <a href="{{route('commandeSpecifique')}}" class="btn btn-info fa fa-arrow-left btn-xl"></a>
                             @else
                                 <a href="{{route('commande.index')}}" class="btn btn-info fa fa-arrow-left btn-xl"></a>

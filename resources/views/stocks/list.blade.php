@@ -49,7 +49,7 @@
                                                     <td class="alert alert-danger">{{$stock->quaniteStock}}</td>
                                                     <td class="alert alert-danger">{{$stock->quantiteMinimum}}</td>
                                                     <td class="alert alert-danger">{{$stock->quantiteMaximum}}</td>
-                                                    <td class="alert alert-danger">{{$stock->prixStock}}</td>
+                                                    <td class="alert alert-danger">{{strrev(wordwrap(strrev($stock->prixStock), 3,' ',true))}}</td>
                                                 </tr>
                                             @else
                                                 <tr>
@@ -57,7 +57,7 @@
                                                     <td>{{$stock->quaniteStock}}</td>
                                                     <td>{{$stock->quantiteMinimum}}</td>
                                                     <td>{{$stock->quantiteMaximum}}</td>
-                                                    <td>{{$stock->prixStock}}</td>
+                                                    <td>{{strrev(wordwrap(strrev($stock->prixStock), 3,' ',true))}}</td>
                                                 </tr>
                                             @endif
                                     @endforeach

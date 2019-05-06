@@ -15,9 +15,11 @@ class CreateReceptionsTable extends Migration
     {
         Schema::create('receptions', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('fournisseurs_id')->index()->foreign('fournisseurs_id')->references('id')->on('fournisseurs')->onDelete('cascade');
+            $table->integer('users_id')->index()->foreign('users_id')->references('id')->on('users')->onDelete('cascade');
+            $table->integer('commandes_id')->index()->foreign('commandes_id')->references('id')->on('commandes')->onDelete('cascade');
             $table->string('codeReception');
             $table->date('dateReception');
+            $table->double('montantApayer')->nullable();
             $table->string('slug');
             $table->timestamps();
         });
